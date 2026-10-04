@@ -1,343 +1,412 @@
 /* =========================================================
-   PATIENTCARE AI DASHBOARD
-   Dynamic Patient + Doctor Management
-========================================================= */
+   AI ADAPTIVE PATIENT-CARE GLOVE
+   DASHBOARD JAVASCRIPT
+   ========================================================= */
 
 
-/* ================= DATA ================= */
+/* =========================================================
+   1. DATA
+   ========================================================= */
 
-let patients = JSON.parse(
-    localStorage.getItem("patientCarePatients")
-) || [
-    {
-        id: "P001",
-        name: "John Doe",
-        age: 42,
-        condition: "Paralysis",
-        glove: "Connected",
-        heartRate: 72,
-        spo2: 97,
-        temperature: 36.5,
-        bloodPressure: "118/76"
-    }
-];
+let patientData = JSON.parse(localStorage.getItem("patientData"));
 
+if (!patientData) {
+    patientData = {
+        name: "Rahul Kumar",
+        age: 28,
+        condition: "Paralysis / Limited Hand Movement",
 
-let doctors = JSON.parse(
-    localStorage.getItem("patientCareDoctors")
-) || [
-    {
-        id: "D001",
-        name: "Dr. Sarah Wilson",
-        specialty: "Neurologist",
-        email: "sarah.wilson@patientcare.com",
-        department: "Neurology"
-    }
-];
+        heartRate: 76,
+        spo2: 98,
+        temperature: 36.7,
+        bloodPressure: "120/80",
 
+        request: "No request",
+        requestTime: "--",
 
-let selectedPatientId =
-    localStorage.getItem("selectedPatientId") ||
-    patients[0]?.id ||
-    null;
+        emergency: false,
+        emergencyCount: 0
+    };
 
-
-let selectedDoctorId =
-    localStorage.getItem("selectedDoctorId") ||
-    doctors[0]?.id ||
-    null;
-
-
-let patientData = null;
-
-
-/* ================= INITIALIZATION ================= */
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    initializeDashboard();
-
-    setupNavigation();
-
-    setupForms();
-
-    setupDoctorProfile();
-
-    renderPatients();
-
-    renderDoctors();
-
-    loadSelectedPatient();
-
-    updateDoctorHeader();
-
-});
-
-
-function initializeDashboard() {
-
-    if (!selectedPatientId && patients.length > 0) {
-        selectedPatientId = patients[0].id;
-    }
-
-    if (!selectedDoctorId && doctors.length > 0) {
-        selectedDoctorId = doctors[0].id;
-    }
-
-    saveData();
-
+    localStorage.setItem(
+        "patientData",
+        JSON.stringify(patientData)
+    );
 }
 
 
-/* ================= LOCAL STORAGE ================= */
+let patients = JSON.parse(localStorage.getItem("patients"));
+
+if (!patients) {
+
+    patients = [
+        {
+            id: 1,
+            name: "Rahul Kumar",
+            age: 28,
+            condition: "Paralysis / Limited Hand Movement"
+        },
+        {
+            id: 2,
+            name: "Ananya Sharma",
+            age: 35,
+            condition: "Spinal Cord Injury"
+        },
+        {
+            id: 3,
+            name: "Arjun Patel",
+            age: 42,
+            condition: "Stroke Recovery"
+        }
+    ];
+
+    localStorage.setItem(
+        "patients",
+        JSON.stringify(patients)
+    );
+}
+
+
+let doctors = JSON.parse(localStorage.getItem("doctors"));
+
+if (!doctors) {
+
+    doctors = [
+        {
+            id: 1,
+            name: "Dr. Priya Sharma",
+            specialization: "Neurologist",
+            phone: "+91 9876543210"
+        },
+        {
+            id: 2,
+            name: "Dr. Arjun Rao",
+            specialization: "Emergency Physician",
+            phone: "+91 9876543211"
+        }
+    ];
+
+    localStorage.setItem(
+        "doctors",
+        JSON.stringify(doctors)
+    );
+}
+
+
+let selectedPatientId =
+    Number(localStorage.getItem("selectedPatientId")) || 1;
+
+let selectedDoctorId =
+    Number(localStorage.getItem("selectedDoctorId")) || 1;
+
+
+/* =========================================================
+   2. SAVE DATA
+   ========================================================= */
 
 function saveData() {
 
     localStorage.setItem(
-        "patientCarePatients",
+        "patientData",
+        JSON.stringify(patientData)
+    );
+
+    localStorage.setItem(
+        "patients",
         JSON.stringify(patients)
     );
 
     localStorage.setItem(
-        "patientCareDoctors",
+        "doctors",
         JSON.stringify(doctors)
     );
 
-    if (selectedPatientId) {
-        localStorage.setItem(
-            "selectedPatientId",
-            selectedPatientId
-        );
-    }
+    localStorage.setItem(
+        "selectedPatientId",
+        selectedPatientId
+    );
 
-    if (selectedDoctorId) {
-        localStorage.setItem(
-            "selectedDoctorId",
-            selectedDoctorId
-        );
-    }
-
+    localStorage.setItem(
+        "selectedDoctorId",
+        selectedDoctorId
+    );
 }
 
 
-/* ================= NAVIGATION ================= */
+/* =========================================================
+   3. INITIALIZATION
+   ========================================================= */
 
-function setupNavigation() {
+document.addEventListener("DOMContentLoaded", function () {
+
+    updateDashboard();
+    updatePatients();
+    updateDoctors();
+    updateHealthMonitor();
+    updateAlerts();
+    updateReport();
+    updateAIAnalysis();
+    updateDoctorProfile();
+
+    showSection("dashboard");
+
+});
+
+
+/* =========================================================
+   4. NAVIGATION
+   ========================================================= */
+
+function showSection(sectionName) {
+
+    const sections = document.querySelectorAll(".section");
+
+    sections.forEach(function (section) {
+        section.style.display = "none";
+    });
+
+
+    const selectedSection =
+        document.getElementById(sectionName);
+
+    if (selectedSection) {
+        selectedSection.style.display = "block";
+    }
+
 
     const navItems =
         document.querySelectorAll(".nav-item");
 
-    const pageSections =
-        document.querySelectorAll(".page-section");
+    navItems.forEach(function (item) {
+        item.classList.remove("active");
+    });
 
 
     navItems.forEach(function (item) {
 
-        item.addEventListener("click", function (event) {
+        const text =
+            item.textContent
+                .trim()
+                .toLowerCase();
 
-            event.preventDefault();
-
-            navItems.forEach(function (nav) {
-                nav.classList.remove("active");
-            });
-
+        if (text.includes(sectionName.toLowerCase())) {
             item.classList.add("active");
-
-
-            pageSections.forEach(function (section) {
-                section.classList.remove(
-                    "active-section"
-                );
-            });
-
-
-            const sectionId =
-                item.getAttribute("data-section");
-
-
-            const selectedSection =
-                document.getElementById(sectionId);
-
-
-            if (selectedSection) {
-
-                selectedSection.classList.add(
-                    "active-section"
-                );
-
-            }
-
-
-            updatePageHeader(sectionId);
-
-            closeDoctorProfile();
-
-        });
+        }
 
     });
 
 }
 
 
-function updatePageHeader(sectionId) {
+/* =========================================================
+   5. GET CURRENT PATIENT
+   ========================================================= */
 
-    const titles = {
+function getCurrentPatient() {
 
-        dashboardSection: [
-            "Dashboard",
-            "AI-powered patient monitoring"
-        ],
+    const patient =
+        patients.find(function (p) {
+            return Number(p.id) === Number(selectedPatientId);
+        });
 
-        patientsSection: [
-            "Patients",
-            "Manage registered patients"
-        ],
+    if (patient) {
+        return patient;
+    }
 
-        doctorsSection: [
-            "Doctors",
-            "Manage doctors and medical staff"
-        ],
-
-        healthSection: [
-            "Health Monitor",
-            "Real-time patient health monitoring"
-        ],
-
-        alertsSection: [
-            "Alerts",
-            "Emergency and health alerts"
-        ],
-
-        reportsSection: [
-            "Reports",
-            "Patient health reports"
-        ],
-
-        settingsSection: [
-            "Settings",
-            "Dashboard configuration"
-        ]
-
-    };
-
-
-    const data = titles[sectionId];
-
-    if (!data) return;
-
-
-    document.getElementById("pageTitle")
-        .textContent = data[0];
-
-    document.getElementById("pageSubtitle")
-        .textContent = data[1];
-
+    return patients[0];
 }
 
 
-/* ================= PATIENT MANAGEMENT ================= */
+/* =========================================================
+   6. GET CURRENT DOCTOR
+   ========================================================= */
 
-function renderPatients() {
+function getCurrentDoctor() {
+
+    const doctor =
+        doctors.find(function (d) {
+            return Number(d.id) === Number(selectedDoctorId);
+        });
+
+    if (doctor) {
+        return doctor;
+    }
+
+    return doctors[0];
+}
+
+
+/* =========================================================
+   7. UPDATE DASHBOARD
+   ========================================================= */
+
+function updateDashboard() {
+
+    const patient =
+        getCurrentPatient();
+
+    if (!patient) return;
+
+
+    /* Patient name */
+
+    const patientName =
+        document.getElementById("patientName");
+
+    if (patientName) {
+        patientName.textContent =
+            patient.name;
+    }
+
+
+    /* Patient age */
+
+    const patientAge =
+        document.getElementById("patientAge");
+
+    if (patientAge) {
+        patientAge.textContent =
+            patient.age + " years";
+    }
+
+
+    /* Patient condition */
+
+    const patientCondition =
+        document.getElementById("patientCondition");
+
+    if (patientCondition) {
+        patientCondition.textContent =
+            patient.condition;
+    }
+
+
+    /* Heart rate */
+
+    const heartRate =
+        document.getElementById("heartRate");
+
+    if (heartRate) {
+        heartRate.textContent =
+            patientData.heartRate;
+    }
+
+
+    /* SpO2 */
+
+    const spo2 =
+        document.getElementById("spo2");
+
+    if (spo2) {
+        spo2.textContent =
+            patientData.spo2;
+    }
+
+
+    /* Temperature */
+
+    const temperature =
+        document.getElementById("temperature");
+
+    if (temperature) {
+        temperature.textContent =
+            patientData.temperature.toFixed(1);
+    }
+
+
+    /* Blood pressure */
+
+    const bloodPressure =
+        document.getElementById("bloodPressure");
+
+    if (bloodPressure) {
+        bloodPressure.textContent =
+            patientData.bloodPressure;
+    }
+
+
+    /* Request */
+
+    const request =
+        document.getElementById("patientRequest");
+
+    if (request) {
+        request.textContent =
+            patientData.request;
+    }
+
+
+    const requestTime =
+        document.getElementById("requestTime");
+
+    if (requestTime) {
+        requestTime.textContent =
+            patientData.requestTime;
+    }
+
+
+    /* Emergency */
+
+    updateEmergencyDisplay();
+
+    updateAIAnalysis();
+}
+
+
+/* =========================================================
+   8. PATIENTS
+   ========================================================= */
+
+function updatePatients() {
 
     const container =
         document.getElementById("patientsList");
 
+    if (!container) return;
+
+
     container.innerHTML = "";
 
 
-    if (patients.length === 0) {
+    patients.forEach(function (patient) {
 
-        container.innerHTML = `
-            <div class="empty-alert">
-                No patients registered.
-                Click <strong>+ Add Patient</strong> to add one.
-            </div>
-        `;
+        const card =
+            document.createElement("div");
 
-        return;
-    }
-
-
-    patients.forEach(function (patient, index) {
-
-        const card = document.createElement("div");
-
-        card.className = "person-card";
+        card.className =
+            "patient-card";
 
 
         card.innerHTML = `
 
-            <div class="person-header">
+            <div>
+                <h3>${patient.name}</h3>
 
-                <div class="person-avatar">
-                    👤
-                </div>
+                <p>
+                    Age: ${patient.age}
+                </p>
 
-                <div>
-                    <h3>${escapeHTML(patient.name)}</h3>
-
-                    <span class="id">
-                        ${escapeHTML(patient.id)}
-                    </span>
-                </div>
-
+                <p>
+                    ${patient.condition}
+                </p>
             </div>
 
-
-            <div class="person-details">
-
-                <p>
-                    Age:
-                    <strong>${patient.age}</strong>
-                </p>
-
-                <p>
-                    Condition:
-                    <strong>
-                        ${escapeHTML(patient.condition)}
-                    </strong>
-                </p>
-
-                <p>
-                    Glove:
-                    <strong>
-                        ${escapeHTML(patient.glove)}
-                    </strong>
-                </p>
-
-                <p>
-                    Heart Rate:
-                    <strong>
-                        ${patient.heartRate} BPM
-                    </strong>
-                </p>
-
-            </div>
-
-
-            <div class="person-actions">
+            <div class="patient-actions">
 
                 <button
-                    class="view"
-                    onclick="selectPatient('${patient.id}')"
-                >
+                    class="primary-btn"
+                    onclick="selectPatient(${patient.id})">
                     View
                 </button>
 
                 <button
-                    onclick="editPatient(${index})"
-                >
-                    Edit
-                </button>
-
-                <button
-                    class="delete"
-                    onclick="deletePatient(${index})"
-                >
+                    class="secondary-btn"
+                    onclick="deletePatient(${patient.id})">
                     Delete
                 </button>
 
             </div>
+
         `;
 
 
@@ -348,494 +417,217 @@ function renderPatients() {
 }
 
 
-function openPatientModal(index = null) {
+/* =========================================================
+   SELECT PATIENT
+   ========================================================= */
 
-    const modal =
-        document.getElementById("patientModal");
+function selectPatient(id) {
 
-    const title =
-        document.getElementById("patientModalTitle");
+    selectedPatientId =
+        Number(id);
 
 
-    if (index === null) {
+    const selected =
+        patients.find(function (p) {
+            return Number(p.id) === Number(id);
+        });
 
-        title.textContent = "Add Patient";
 
-        document.getElementById("editPatientIndex").value = "";
+    if (selected) {
 
-        document.getElementById("patientNameInput").value = "";
+        patientData.name =
+            selected.name;
 
-        document.getElementById("patientIdInput").value =
-            generatePatientId();
+        patientData.age =
+            selected.age;
 
-        document.getElementById("patientAgeInput").value = "";
-
-        document.getElementById("patientConditionInput").value =
-            "Paralysis";
-
-        document.getElementById("patientGloveInput").value =
-            "Connected";
-
-    } else {
-
-        const patient = patients[index];
-
-        title.textContent = "Edit Patient";
-
-        document.getElementById("editPatientIndex").value =
-            index;
-
-        document.getElementById("patientNameInput").value =
-            patient.name;
-
-        document.getElementById("patientIdInput").value =
-            patient.id;
-
-        document.getElementById("patientAgeInput").value =
-            patient.age;
-
-        document.getElementById("patientConditionInput").value =
-            patient.condition;
-
-        document.getElementById("patientGloveInput").value =
-            patient.glove;
+        patientData.condition =
+            selected.condition;
 
     }
 
 
-    modal.classList.add("show");
+    saveData();
+
+    updateDashboard();
+    updateHealthMonitor();
+    updateReport();
+    updateAIAnalysis();
+
+
+    showSection("dashboard");
 
 }
 
 
-function closePatientModal() {
+/* =========================================================
+   ADD PATIENT
+   ========================================================= */
 
-    document
-        .getElementById("patientModal")
-        .classList.remove("show");
+function addPatient() {
+
+    const name =
+        prompt("Enter patient name:");
+
+    if (!name) return;
+
+
+    const age =
+        prompt("Enter patient age:");
+
+    if (!age) return;
+
+
+    const condition =
+        prompt("Enter patient condition:");
+
+    if (!condition) return;
+
+
+    const newPatient = {
+
+        id:
+            Date.now(),
+
+        name:
+            name,
+
+        age:
+            Number(age),
+
+        condition:
+            condition
+
+    };
+
+
+    patients.push(newPatient);
+
+    saveData();
+
+    updatePatients();
+
+    alert(
+        "Patient added successfully."
+    );
 
 }
 
 
-function editPatient(index) {
+/* =========================================================
+   DELETE PATIENT
+   ========================================================= */
 
-    openPatientModal(index);
+function deletePatient(id) {
 
-}
+    if (patients.length <= 1) {
 
+        alert(
+            "At least one patient must remain."
+        );
 
-function deletePatient(index) {
-
-    const patient = patients[index];
-
-
-    if (!confirm(
-        `Delete patient "${patient.name}"?`
-    )) {
         return;
     }
 
 
-    const deletedId = patient.id;
+    const confirmDelete =
+        confirm(
+            "Are you sure you want to delete this patient?"
+        );
 
 
-    patients.splice(index, 1);
+    if (!confirmDelete) return;
 
 
-    if (selectedPatientId === deletedId) {
+    patients =
+        patients.filter(function (patient) {
 
-        if (patients.length > 0) {
-
-            selectedPatientId = patients[0].id;
-
-        } else {
-
-            selectedPatientId = null;
-
-        }
-
-    }
-
-
-    saveData();
-
-    renderPatients();
-
-    loadSelectedPatient();
-
-}
-
-
-function selectPatient(patientId) {
-
-    selectedPatientId = patientId;
-
-    saveData();
-
-    loadSelectedPatient();
-
-    renderPatients();
-
-
-    showSection("dashboardSection");
-
-}
-
-
-function loadSelectedPatient() {
-
-    const patient =
-        patients.find(function (item) {
-
-            return item.id === selectedPatientId;
+            return Number(patient.id)
+                !== Number(id);
 
         });
 
 
-    if (!patient) {
+    if (Number(selectedPatientId) === Number(id)) {
 
-        patientData = null;
+        selectedPatientId =
+            patients[0].id;
 
-        return;
+        patientData.name =
+            patients[0].name;
 
+        patientData.age =
+            patients[0].age;
+
+        patientData.condition =
+            patients[0].condition;
     }
 
 
-    patientData = patient;
+    saveData();
 
-
-    updateDashboardPatient();
-
+    updatePatients();
     updateDashboard();
-
+    updateHealthMonitor();
     updateReport();
 
 }
 
 
-function updateDashboardPatient() {
-
-    if (!patientData) return;
-
-
-    document.getElementById(
-        "dashboardPatientName"
-    ).textContent = patientData.name;
-
-
-    document.getElementById(
-        "dashboardPatientId"
-    ).textContent = patientData.id;
-
-
-    document.getElementById(
-        "dashboardPatientAge"
-    ).textContent = patientData.age;
-
-
-    document.getElementById(
-        "dashboardPatientCondition"
-    ).textContent = patientData.condition;
-
-
-    document.getElementById(
-        "monitorPatientName"
-    ).textContent = patientData.name;
-
-
-    document.getElementById(
-        "reportPatientName"
-    ).textContent = patientData.name;
-
-}
-
-
-/* ================= PATIENT FORM ================= */
-
-function setupForms() {
-
-    document
-        .getElementById("patientForm")
-        .addEventListener(
-            "submit",
-            savePatient
-        );
-
-
-    document
-        .getElementById("doctorForm")
-        .addEventListener(
-            "submit",
-            saveDoctor
-        );
-
-}
-
-
-function savePatient(event) {
-
-    event.preventDefault();
-
-
-    const editIndex =
-        document.getElementById(
-            "editPatientIndex"
-        ).value;
-
-
-    let id =
-        document.getElementById(
-            "patientIdInput"
-        ).value.trim();
-
-
-    const name =
-        document.getElementById(
-            "patientNameInput"
-        ).value.trim();
-
-
-    const age =
-        Number(
-            document.getElementById(
-                "patientAgeInput"
-            ).value
-        );
-
-
-    const condition =
-        document.getElementById(
-            "patientConditionInput"
-        ).value.trim();
-
-
-    const glove =
-        document.getElementById(
-            "patientGloveInput"
-        ).value;
-
-
-    if (!id) {
-
-        id = generatePatientId();
-
-    }
-
-
-    if (!name || !age || !condition) {
-
-        alert("Please fill all required fields.");
-
-        return;
-
-    }
-
-
-    const patient = {
-
-        id: id,
-
-        name: name,
-
-        age: age,
-
-        condition: condition,
-
-        glove: glove,
-
-        heartRate: 72,
-
-        spo2: 97,
-
-        temperature: 36.5,
-
-        bloodPressure: "118/76"
-
-    };
-
-
-    if (editIndex === "") {
-
-        patients.push(patient);
-
-        selectedPatientId = id;
-
-    } else {
-
-        const oldPatient =
-            patients[Number(editIndex)];
-
-
-        patient.heartRate =
-            oldPatient.heartRate;
-
-        patient.spo2 =
-            oldPatient.spo2;
-
-        patient.temperature =
-            oldPatient.temperature;
-
-        patient.bloodPressure =
-            oldPatient.bloodPressure;
-
-
-        patients[Number(editIndex)] =
-            patient;
-
-
-        if (
-            selectedPatientId === oldPatient.id
-        ) {
-
-            selectedPatientId = id;
-
-        }
-
-    }
-
-
-    saveData();
-
-    renderPatients();
-
-    loadSelectedPatient();
-
-    closePatientModal();
-
-}
-
-
-function generatePatientId() {
-
-    let number = patients.length + 1;
-
-    let id = "P" + String(number).padStart(3, "0");
-
-
-    while (
-        patients.some(function (patient) {
-            return patient.id === id;
-        })
-    ) {
-
-        number++;
-
-        id = "P" +
-            String(number).padStart(3, "0");
-
-    }
-
-
-    return id;
-
-}
-
-
-/* ================= DOCTOR MANAGEMENT ================= */
-
-function renderDoctors() {
+/* =========================================================
+   9. DOCTORS
+   ========================================================= */
+
+function updateDoctors() {
 
     const container =
         document.getElementById("doctorsList");
 
+    if (!container) return;
+
+
     container.innerHTML = "";
 
 
-    if (doctors.length === 0) {
-
-        container.innerHTML = `
-            <div class="empty-alert">
-                No doctors registered.
-                Click <strong>+ Add Doctor</strong> to add one.
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    doctors.forEach(function (doctor, index) {
-
-        const initials =
-            getInitials(doctor.name);
-
+    doctors.forEach(function (doctor) {
 
         const card =
             document.createElement("div");
 
-
-        card.className = "person-card";
+        card.className =
+            "doctor-card";
 
 
         card.innerHTML = `
 
-            <div class="person-header">
+            <div>
 
-                <div class="person-avatar">
-                    ${initials}
-                </div>
-
-                <div>
-
-                    <h3>
-                        ${escapeHTML(doctor.name)}
-                    </h3>
-
-                    <span class="id">
-                        ${escapeHTML(doctor.id)}
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <div class="person-details">
+                <h3>
+                    ${doctor.name}
+                </h3>
 
                 <p>
-                    Specialty:
-                    <strong>
-                        ${escapeHTML(doctor.specialty)}
-                    </strong>
+                    ${doctor.specialization}
                 </p>
 
                 <p>
-                    Department:
-                    <strong>
-                        ${escapeHTML(doctor.department)}
-                    </strong>
-                </p>
-
-                <p>
-                    Email:
-                    <strong>
-                        ${escapeHTML(doctor.email)}
-                    </strong>
+                    ${doctor.phone}
                 </p>
 
             </div>
 
 
-            <div class="person-actions">
+            <div class="doctor-actions">
 
                 <button
-                    class="view"
-                    onclick="selectDoctor('${doctor.id}')"
-                >
+                    class="primary-btn"
+                    onclick="selectDoctor(${doctor.id})">
                     Select
                 </button>
 
                 <button
-                    onclick="editDoctor(${index})"
-                >
-                    Edit
-                </button>
-
-                <button
-                    class="delete"
-                    onclick="deleteDoctor(${index})"
-                >
+                    class="secondary-btn"
+                    onclick="deleteDoctor(${doctor.id})">
                     Delete
                 </button>
 
@@ -851,680 +643,461 @@ function renderDoctors() {
 }
 
 
-function openDoctorModal(index = null) {
+/* =========================================================
+   SELECT DOCTOR
+   ========================================================= */
 
-    const modal =
-        document.getElementById("doctorModal");
+function selectDoctor(id) {
 
-
-    const title =
-        document.getElementById("doctorModalTitle");
-
-
-    if (index === null) {
-
-        title.textContent = "Add Doctor";
-
-        document.getElementById(
-            "editDoctorIndex"
-        ).value = "";
-
-
-        document.getElementById(
-            "doctorNameInput"
-        ).value = "";
-
-
-        document.getElementById(
-            "doctorIdInput"
-        ).value = generateDoctorId();
-
-
-        document.getElementById(
-            "doctorSpecialtyInput"
-        ).value = "";
-
-
-        document.getElementById(
-            "doctorEmailInput"
-        ).value = "";
-
-
-        document.getElementById(
-            "doctorDepartmentInput"
-        ).value = "";
-
-    } else {
-
-        const doctor = doctors[index];
-
-
-        title.textContent = "Edit Doctor";
-
-
-        document.getElementById(
-            "editDoctorIndex"
-        ).value = index;
-
-
-        document.getElementById(
-            "doctorNameInput"
-        ).value = doctor.name;
-
-
-        document.getElementById(
-            "doctorIdInput"
-        ).value = doctor.id;
-
-
-        document.getElementById(
-            "doctorSpecialtyInput"
-        ).value = doctor.specialty;
-
-
-        document.getElementById(
-            "doctorEmailInput"
-        ).value = doctor.email;
-
-
-        document.getElementById(
-            "doctorDepartmentInput"
-        ).value = doctor.department;
-
-    }
-
-
-    modal.classList.add("show");
-
-}
-
-
-function closeDoctorModal() {
-
-    document
-        .getElementById("doctorModal")
-        .classList.remove("show");
-
-}
-
-
-function saveDoctor(event) {
-
-    event.preventDefault();
-
-
-    const editIndex =
-        document.getElementById(
-            "editDoctorIndex"
-        ).value;
-
-
-    let id =
-        document.getElementById(
-            "doctorIdInput"
-        ).value.trim();
-
-
-    const name =
-        document.getElementById(
-            "doctorNameInput"
-        ).value.trim();
-
-
-    const specialty =
-        document.getElementById(
-            "doctorSpecialtyInput"
-        ).value.trim();
-
-
-    const email =
-        document.getElementById(
-            "doctorEmailInput"
-        ).value.trim();
-
-
-    const department =
-        document.getElementById(
-            "doctorDepartmentInput"
-        ).value.trim();
-
-
-    if (!id) {
-
-        id = generateDoctorId();
-
-    }
-
-
-    if (
-        !name ||
-        !specialty ||
-        !email ||
-        !department
-    ) {
-
-        alert("Please fill all required fields.");
-
-        return;
-
-    }
-
-
-    const doctor = {
-
-        id: id,
-
-        name: name,
-
-        specialty: specialty,
-
-        email: email,
-
-        department: department
-
-    };
-
-
-    if (editIndex === "") {
-
-        doctors.push(doctor);
-
-        selectedDoctorId = id;
-
-    } else {
-
-        doctors[Number(editIndex)] = doctor;
-
-        selectedDoctorId = id;
-
-    }
-
+    selectedDoctorId =
+        Number(id);
 
     saveData();
 
-    renderDoctors();
+    updateDoctorProfile();
 
-    updateDoctorHeader();
-
-    closeDoctorModal();
-
-}
-
-
-function editDoctor(index) {
-
-    openDoctorModal(index);
-
-}
-
-
-function deleteDoctor(index) {
-
-    const doctor = doctors[index];
-
-
-    if (!confirm(
-        `Delete ${doctor.name}?`
-    )) {
-
-        return;
-
-    }
-
-
-    doctors.splice(index, 1);
-
-
-    if (
-        selectedDoctorId === doctor.id
-    ) {
-
-        selectedDoctorId =
-            doctors.length > 0
-                ? doctors[0].id
-                : null;
-
-    }
-
-
-    saveData();
-
-    renderDoctors();
-
-    updateDoctorHeader();
-
-}
-
-
-function selectDoctor(doctorId) {
-
-    selectedDoctorId = doctorId;
-
-    saveData();
-
-    updateDoctorHeader();
-
-    alert("Doctor selected successfully.");
-
-}
-
-
-function updateDoctorHeader() {
-
-    if (doctors.length === 0) {
-
-        document.getElementById(
-            "headerDoctorName"
-        ).textContent = "No Doctor";
-
-
-        return;
-
-    }
-
-
-    const doctor =
-        doctors.find(function (item) {
-
-            return item.id === selectedDoctorId;
-
-        }) || doctors[0];
-
-
-    selectedDoctorId = doctor.id;
-
-
-    document.getElementById(
-        "headerDoctorName"
-    ).textContent = doctor.name;
-
-
-    document.querySelector(
-        ".doctor-profile small"
-    ).textContent = doctor.specialty;
-
-
-    document.querySelector(
-        ".doctor-avatar"
-    ).textContent = getInitials(
-        doctor.name
+    alert(
+        "Doctor selected successfully."
     );
 
-
-    document.getElementById(
-        "popupDoctorName"
-    ).textContent = doctor.name;
+}
 
 
-    document.getElementById(
-        "popupDoctorSpecialty"
-    ).textContent = doctor.specialty;
+/* =========================================================
+   ADD DOCTOR
+   ========================================================= */
+
+function addDoctor() {
+
+    const name =
+        prompt("Enter doctor name:");
+
+    if (!name) return;
 
 
-    document.getElementById(
-        "popupDoctorEmail"
-    ).textContent = doctor.email;
+    const specialization =
+        prompt("Enter specialization:");
+
+    if (!specialization) return;
+
+
+    const phone =
+        prompt("Enter phone number:");
+
+    if (!phone) return;
+
+
+    doctors.push({
+
+        id:
+            Date.now(),
+
+        name:
+            name,
+
+        specialization:
+            specialization,
+
+        phone:
+            phone
+
+    });
+
+
+    saveData();
+
+    updateDoctors();
 
 }
 
 
-function generateDoctorId() {
+/* =========================================================
+   DELETE DOCTOR
+   ========================================================= */
 
-    let number = doctors.length + 1;
+function deleteDoctor(id) {
 
-    let id =
-        "D" +
-        String(number).padStart(3, "0");
+    if (doctors.length <= 1) {
+
+        alert(
+            "At least one doctor must remain."
+        );
+
+        return;
+    }
 
 
-    while (
-        doctors.some(function (doctor) {
-            return doctor.id === id;
-        })
-    ) {
+    const confirmDelete =
+        confirm(
+            "Delete this doctor?"
+        );
 
-        number++;
 
-        id =
-            "D" +
-            String(number).padStart(3, "0");
+    if (!confirmDelete) return;
+
+
+    doctors =
+        doctors.filter(function (doctor) {
+
+            return Number(doctor.id)
+                !== Number(id);
+
+        });
+
+
+    if (Number(selectedDoctorId) === Number(id)) {
+
+        selectedDoctorId =
+            doctors[0].id;
 
     }
 
 
-    return id;
+    saveData();
+
+    updateDoctors();
+
+    updateDoctorProfile();
 
 }
 
 
-/* ================= HEALTH MONITOR ================= */
+/* =========================================================
+   10. DOCTOR PROFILE
+   ========================================================= */
 
-function updateDashboard() {
+function updateDoctorProfile() {
 
-    if (!patientData) return;
+    const doctor =
+        getCurrentDoctor();
 
-
-    document.getElementById(
-        "heartRate"
-    ).textContent =
-        patientData.heartRate;
-
-
-    document.getElementById(
-        "spo2"
-    ).textContent =
-        patientData.spo2;
+    if (!doctor) return;
 
 
-    document.getElementById(
-        "temperature"
-    ).textContent =
-        Number(patientData.temperature).toFixed(1);
+    const doctorName =
+        document.getElementById("doctorName");
+
+    if (doctorName) {
+
+        doctorName.textContent =
+            doctor.name;
+
+    }
 
 
-    document.getElementById(
-        "bloodPressure"
-    ).textContent =
-        patientData.bloodPressure;
+    const doctorSpecialization =
+        document.getElementById(
+            "doctorSpecialization"
+        );
 
+    if (doctorSpecialization) {
 
-    document.getElementById(
-        "monitorHeartRate"
-    ).textContent =
-        patientData.heartRate;
+        doctorSpecialization.textContent =
+            doctor.specialization;
 
-
-    document.getElementById(
-        "monitorSpo2"
-    ).textContent =
-        patientData.spo2;
-
-
-    document.getElementById(
-        "monitorTemperature"
-    ).textContent =
-        Number(patientData.temperature).toFixed(1);
-
-
-    document.getElementById(
-        "monitorBloodPressure"
-    ).textContent =
-        patientData.bloodPressure;
-
-
-    document.getElementById(
-        "lastUpdated"
-    ).textContent =
-        "Updated just now";
-
-
-    analyzePatient();
+    }
 
 }
 
 
-/* ================= AI ANALYSIS ================= */
+/* =========================================================
+   11. HEALTH MONITOR
+   ========================================================= */
 
-function analyzePatient() {
+function updateHealthMonitor() {
 
-    if (!patientData) return;
+    const heart =
+        document.getElementById(
+            "monitorHeartRate"
+        );
+
+    if (heart) {
+
+        heart.textContent =
+            patientData.heartRate +
+            " BPM";
+
+    }
+
+
+    const oxygen =
+        document.getElementById(
+            "monitorSpo2"
+        );
+
+    if (oxygen) {
+
+        oxygen.textContent =
+            patientData.spo2 +
+            "%";
+
+    }
+
+
+    const temp =
+        document.getElementById(
+            "monitorTemperature"
+        );
+
+    if (temp) {
+
+        temp.textContent =
+            patientData.temperature.toFixed(1) +
+            " °C";
+
+    }
+
+
+    const bp =
+        document.getElementById(
+            "monitorBloodPressure"
+        );
+
+    if (bp) {
+
+        bp.textContent =
+            patientData.bloodPressure;
+
+    }
+
+}
+
+
+/* =========================================================
+   12. AI PATIENT ANALYSIS
+   ========================================================= */
+
+function updateAIAnalysis() {
+
+    let risk =
+        "LOW";
+
+    let recommendation =
+        "Patient condition appears stable.";
+
+    let className =
+        "low";
 
 
     const hr =
         Number(patientData.heartRate);
 
-    const spo2 =
+    const oxygen =
         Number(patientData.spo2);
 
     const temp =
         Number(patientData.temperature);
 
 
-    let risk = "LOW";
-
-    let status = "Stable";
-
-    let recommendation =
-        "AI recommends continuing normal monitoring.";
-
-
     if (
-        hr > 120 ||
-        hr < 45 ||
-        spo2 < 90 ||
-        temp > 39 ||
+        hr < 55 ||
+        hr > 105 ||
+        oxygen < 94 ||
+        temp > 38 ||
         temp < 35
     ) {
 
-        risk = "HIGH";
-
-        status = "Needs Attention";
+        risk =
+            "HIGH";
 
         recommendation =
-            "AI recommends immediate medical attention and checking the patient's condition.";
+            "Immediate medical attention may be required.";
+
+        className =
+            "high";
 
     }
 
-
     else if (
+        hr < 60 ||
         hr > 100 ||
-        hr < 55 ||
-        spo2 < 94 ||
+        oxygen < 96 ||
         temp > 37.5
     ) {
 
-        risk = "MEDIUM";
-
-        status = "Monitor";
+        risk =
+            "MEDIUM";
 
         recommendation =
-            "AI recommends closer monitoring of the patient's health values.";
+            "Continue monitoring the patient closely.";
+
+        className =
+            "medium";
 
     }
 
 
-    document.getElementById(
-        "aiRiskLevel"
-    ).textContent =
-        risk + " RISK";
-
-
-    document.getElementById(
-        "patientStatus"
-    ).textContent =
-        status;
-
-
-    document.getElementById(
-        "aiRecommendation"
-    ).textContent =
-        recommendation;
-
-
-    const icon =
+    const riskElement =
         document.getElementById(
-            "aiStatusIcon"
+            "aiRisk"
         );
 
 
-    const box =
+    if (riskElement) {
+
+        riskElement.textContent =
+            risk;
+
+        riskElement.className =
+            className;
+
+    }
+
+
+    const recommendationElement =
         document.getElementById(
-            "aiStatusBox"
+            "aiRecommendation"
         );
 
 
-    if (risk === "HIGH") {
+    if (recommendationElement) {
 
-        icon.textContent = "!";
-
-        icon.style.background = "#fee2e2";
-
-        icon.style.color = "#dc2626";
-
-        document.getElementById(
-            "aiRiskLevel"
-        ).style.color = "#dc2626";
-
-    }
-
-    else if (risk === "MEDIUM") {
-
-        icon.textContent = "!";
-
-        icon.style.background = "#fef3c7";
-
-        icon.style.color = "#d97706";
-
-        document.getElementById(
-            "aiRiskLevel"
-        ).style.color = "#d97706";
-
-    }
-
-    else {
-
-        icon.textContent = "✓";
-
-        icon.style.background = "#dcfce7";
-
-        icon.style.color = "#16a34a";
-
-        document.getElementById(
-            "aiRiskLevel"
-        ).style.color = "#16a34a";
+        recommendationElement.textContent =
+            recommendation;
 
     }
 
 }
 
 
-/* ================= GESTURES ================= */
+/* =========================================================
+   13. MANUAL GESTURE BUTTONS
+   ========================================================= */
 
-function detectGesture(type) {
+function detectGesture(gesture) {
 
-    const gestures = {
+    let message =
+        "";
 
-        water: {
-            icon: "💧",
-            name: "Water",
-            meaning: "Patient needs water"
-        },
-
-        food: {
-            icon: "🍎",
-            name: "Food",
-            meaning: "Patient needs food"
-        },
-
-        washroom: {
-            icon: "🚻",
-            name: "Washroom",
-            meaning: "Patient needs assistance to use the washroom"
-        },
-
-        emergency: {
-            icon: "🚨",
-            name: "Emergency",
-            meaning: "Patient requires immediate assistance"
-        }
-
-    };
+    let icon =
+        "✋";
 
 
-    const gesture = gestures[type];
+    if (gesture === "water") {
 
+        message =
+            "Patient needs water.";
 
-    if (!gesture) return;
-
-
-    document.getElementById(
-        "gestureIcon"
-    ).textContent = gesture.icon;
-
-
-    document.getElementById(
-        "gestureName"
-    ).textContent = gesture.name;
-
-
-    document.getElementById(
-        "gestureMeaning"
-    ).textContent = gesture.meaning;
-
-
-    document.getElementById(
-        "gestureTime"
-    ).textContent =
-        "Detected at " +
-        new Date().toLocaleTimeString();
-
-
-    if (type === "water") {
-
-        document.getElementById(
-            "requestText"
-        ).textContent =
-            "Patient needs water";
+        icon =
+            "👍";
 
     }
 
-    else if (type === "food") {
 
-        document.getElementById(
-            "requestText"
-        ).textContent =
-            "Patient needs food";
+    else if (gesture === "food") {
 
-    }
+        message =
+            "Patient needs food.";
 
-    else if (type === "washroom") {
-
-        document.getElementById(
-            "requestText"
-        ).textContent =
-            "Patient needs washroom assistance";
+        icon =
+            "✊";
 
     }
 
-    else if (type === "emergency") {
+
+    else if (gesture === "washroom") {
+
+        message =
+            "Patient needs assistance to use the washroom.";
+
+        icon =
+            "✋";
+
+    }
+
+
+    else if (gesture === "emergency") {
+
+        message =
+            "Emergency assistance required.";
+
+        icon =
+            "✌️";
 
         triggerEmergency();
 
     }
 
+
+    patientData.request =
+        message;
+
+    patientData.requestTime =
+        new Date().toLocaleTimeString();
+
+
+    saveData();
+
+    updateDashboard();
+
+
+    const iconElement =
+        document.getElementById(
+            "cameraGestureIcon"
+        );
+
+    const nameElement =
+        document.getElementById(
+            "cameraGestureName"
+        );
+
+    const meaningElement =
+        document.getElementById(
+            "cameraGestureMeaning"
+        );
+
+
+    if (iconElement) {
+
+        iconElement.textContent =
+            icon;
+
+    }
+
+
+    if (nameElement) {
+
+        nameElement.textContent =
+            gesture.toUpperCase();
+
+    }
+
+
+    if (meaningElement) {
+
+        meaningElement.textContent =
+            message;
+
+    }
+
 }
 
 
-/* ================= EMERGENCY ================= */
+/* =========================================================
+   14. EMERGENCY
+   ========================================================= */
 
 function triggerEmergency() {
 
-    document.getElementById(
-        "normalAlert"
-    ).classList.add("hidden");
+    patientData.emergency =
+        true;
+
+    patientData.emergencyCount =
+        Number(patientData.emergencyCount || 0) + 1;
 
 
-    document.getElementById(
-        "emergencyAlert"
-    ).classList.remove("hidden");
+    patientData.request =
+        "EMERGENCY ALERT";
+
+    patientData.requestTime =
+        new Date().toLocaleTimeString();
 
 
-    document.getElementById(
-        "resolveButton"
-    ).classList.remove("hidden");
+    saveData();
 
-
-    document.getElementById(
-        "alertCount"
-    ).textContent = "1";
-
-
-    document.getElementById(
-        "notificationCount"
-    ).textContent = "1";
-
-
-    updateAlertsPage();
+    updateEmergencyDisplay();
+    updateAlerts();
+    updateDashboard();
 
 
     alert(
@@ -1534,83 +1107,163 @@ function triggerEmergency() {
 }
 
 
-function resolveEmergency() {
+/* =========================================================
+   EMERGENCY DISPLAY
+   ========================================================= */
 
-    document.getElementById(
-        "normalAlert"
-    ).classList.remove("hidden");
+function updateEmergencyDisplay() {
 
-
-    document.getElementById(
-        "emergencyAlert"
-    ).classList.add("hidden");
-
-
-    document.getElementById(
-        "resolveButton"
-    ).classList.add("hidden");
+    const emergencyPanel =
+        document.getElementById(
+            "emergencyPanel"
+        );
 
 
-    document.getElementById(
-        "alertCount"
-    ).textContent = "0";
+    const emergencyStatus =
+        document.getElementById(
+            "emergencyStatus"
+        );
 
 
-    document.getElementById(
-        "notificationCount"
-    ).textContent = "0";
+    const emergencyCount =
+        document.getElementById(
+            "emergencyCount"
+        );
 
 
-    updateAlertsPage();
+    if (emergencyCount) {
+
+        emergencyCount.textContent =
+            patientData.emergencyCount || 0;
+
+    }
+
+
+    if (patientData.emergency) {
+
+        if (emergencyPanel) {
+
+            emergencyPanel.classList.add(
+                "emergency-active"
+            );
+
+        }
+
+
+        if (emergencyStatus) {
+
+            emergencyStatus.textContent =
+                "🚨 EMERGENCY ACTIVE";
+
+        }
+
+    }
+
+    else {
+
+        if (emergencyPanel) {
+
+            emergencyPanel.classList.remove(
+                "emergency-active"
+            );
+
+        }
+
+
+        if (emergencyStatus) {
+
+            emergencyStatus.textContent =
+                "No active emergency";
+
+        }
+
+    }
 
 }
 
 
-function updateAlertsPage() {
+/* =========================================================
+   RESOLVE EMERGENCY
+   ========================================================= */
 
-    const container =
+function resolveEmergency() {
+
+    patientData.emergency =
+        false;
+
+
+    patientData.request =
+        "No request";
+
+
+    patientData.requestTime =
+        new Date().toLocaleTimeString();
+
+
+    saveData();
+
+    updateDashboard();
+    updateEmergencyDisplay();
+    updateAlerts();
+
+}
+
+
+/* =========================================================
+   15. ALERTS
+   ========================================================= */
+
+function updateAlerts() {
+
+    const alertList =
         document.getElementById(
             "alertsList"
         );
 
-
-    const emergencyVisible =
-        !document.getElementById(
-            "emergencyAlert"
-        ).classList.contains("hidden");
+    if (!alertList) return;
 
 
-    if (emergencyVisible) {
+    alertList.innerHTML = "";
 
-        container.innerHTML = `
 
-            <div class="person-card">
+    if (patientData.emergency) {
 
-                <h3 style="color:#dc2626;">
+        alertList.innerHTML = `
+
+            <div class="alert-card emergency-alert">
+
+                <h3>
                     🚨 Emergency Alert
                 </h3>
 
-                <p style="margin-top:10px;">
-                    Emergency gesture detected from
-                    <strong>
-                        ${patientData ? patientData.name : "Patient"}
-                    </strong>.
+                <p>
+                    Patient requires immediate assistance.
                 </p>
 
-                <p style="margin-top:8px;">
-                    Immediate assistance is required.
-                </p>
+                <small>
+                    ${patientData.requestTime}
+                </small>
 
             </div>
 
         `;
 
-    } else {
+    }
 
-        container.innerHTML = `
+    else {
 
-            <div class="empty-alert">
-                ✓ No active alerts
+        alertList.innerHTML = `
+
+            <div class="alert-card">
+
+                <h3>
+                    ✅ No Active Alerts
+                </h3>
+
+                <p>
+                    Patient monitoring is normal.
+                </p>
+
             </div>
 
         `;
@@ -1620,233 +1273,155 @@ function updateAlertsPage() {
 }
 
 
-/* ================= REQUEST ================= */
+/* =========================================================
+   16. PATIENT REQUEST
+   ========================================================= */
 
-function acknowledgeRequest() {
+function updatePatientRequest(request) {
 
-    document.getElementById(
-        "requestText"
-    ).textContent =
-        "Request acknowledged ✓";
+    patientData.request =
+        request;
+
+    patientData.requestTime =
+        new Date().toLocaleTimeString();
 
 
-    setTimeout(function () {
+    saveData();
 
-        if (
-            document.getElementById(
-                "requestText"
-            )
-        ) {
-
-            document.getElementById(
-                "requestText"
-            ).textContent =
-                "Patient needs water";
-
-        }
-
-    }, 3000);
+    updateDashboard();
 
 }
 
 
-/* ================= REPORT ================= */
+/* =========================================================
+   17. REPORT
+   ========================================================= */
 
 function updateReport() {
 
-    if (!patientData) return;
+    const patient =
+        getCurrentPatient();
+
+    if (!patient) return;
 
 
-    document.getElementById(
-        "reportPatientName"
-    ).textContent =
-        patientData.name;
+    const reportPatient =
+        document.getElementById(
+            "reportPatientName"
+        );
 
+    if (reportPatient) {
 
-    document.getElementById(
-        "reportHeartRate"
-    ).textContent =
-        patientData.heartRate + " BPM";
-
-
-    document.getElementById(
-        "reportSpo2"
-    ).textContent =
-        patientData.spo2 + "%";
-
-
-    document.getElementById(
-        "reportTemperature"
-    ).textContent =
-        Number(patientData.temperature).toFixed(1) +
-        " °C";
-
-
-    document.getElementById(
-        "reportBloodPressure"
-    ).textContent =
-        patientData.bloodPressure;
-
-}
-
-
-function generateReport() {
-
-    if (!patientData) {
-
-        alert("Please add a patient first.");
-
-        return;
+        reportPatient.textContent =
+            patient.name;
 
     }
 
 
-    alert(
-        "Health report generated for " +
-        patientData.name +
-        "."
-    );
-
-}
-
-
-/* ================= DOCTOR POPUP ================= */
-
-function setupDoctorProfile() {
-
-    document
-        .getElementById("doctorProfile")
-        .addEventListener(
-            "click",
-            function () {
-
-                document
-                    .getElementById("doctorPopup")
-                    .classList.add("show");
-
-            }
+    const reportHeart =
+        document.getElementById(
+            "reportHeartRate"
         );
 
-}
+    if (reportHeart) {
 
-
-function closeDoctorProfile() {
-
-    document
-        .getElementById("doctorPopup")
-        .classList.remove("show");
-
-}
-
-
-function goToDoctors() {
-
-    closeDoctorProfile();
-
-    showSection("doctorsSection");
-
-}
-
-
-/* ================= SHOW SECTION ================= */
-
-function showSection(sectionId) {
-
-    const navItems =
-        document.querySelectorAll(".nav-item");
-
-    const sections =
-        document.querySelectorAll(".page-section");
-
-
-    navItems.forEach(function (item) {
-
-        item.classList.remove("active");
-
-
-        if (
-            item.getAttribute("data-section")
-            === sectionId
-        ) {
-
-            item.classList.add("active");
-
-        }
-
-    });
-
-
-    sections.forEach(function (section) {
-
-        section.classList.remove(
-            "active-section"
-        );
-
-    });
-
-
-    const section =
-        document.getElementById(sectionId);
-
-
-    if (section) {
-
-        section.classList.add(
-            "active-section"
-        );
+        reportHeart.textContent =
+            patientData.heartRate +
+            " BPM";
 
     }
 
 
-    updatePageHeader(sectionId);
+    const reportSpo2 =
+        document.getElementById(
+            "reportSpo2"
+        );
 
-}
+    if (reportSpo2) {
 
-
-/* ================= UTILITIES ================= */
-
-function getInitials(name) {
-
-    const parts =
-        name.trim().split(" ");
-
-
-    if (parts.length === 1) {
-
-        return parts[0]
-            .substring(0, 2)
-            .toUpperCase();
+        reportSpo2.textContent =
+            patientData.spo2 +
+            "%";
 
     }
 
 
-    return (
-        parts[0][0] +
-        parts[parts.length - 1][0]
-    ).toUpperCase();
+    const reportTemperature =
+        document.getElementById(
+            "reportTemperature"
+        );
+
+    if (reportTemperature) {
+
+        reportTemperature.textContent =
+            patientData.temperature.toFixed(1) +
+            " °C";
+
+    }
+
+
+    const reportBP =
+        document.getElementById(
+            "reportBloodPressure"
+        );
+
+    if (reportBP) {
+
+        reportBP.textContent =
+            patientData.bloodPressure;
+
+    }
 
 }
 
 
-function escapeHTML(value) {
+/* =========================================================
+   18. POPUP
+   ========================================================= */
 
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+function openPopup(id) {
+
+    const popup =
+        document.getElementById(id);
+
+    if (popup) {
+
+        popup.style.display =
+            "flex";
+
+    }
 
 }
 
 
-/* ================= DEMO LIVE MONITORING ================= */
+function closePopup(id) {
 
-/*
-   This simulates changing health values.
+    const popup =
+        document.getElementById(id);
 
-   Later we can replace this with actual
-   ESP32 / sensor / API data.
+    if (popup) {
+
+        popup.style.display =
+            "none";
+
+    }
+
+}
+
+
+/* =========================================================
+   19. DEMO LIVE HEALTH MONITORING
+   =========================================================
+
+   IMPORTANT:
+   This is only simulated data.
+
+   In the real project:
+   ESP32 + sensors
+          ↓
+      Backend/API
+          ↓
+      Dashboard
 */
 
 setInterval(function () {
@@ -1855,7 +1430,9 @@ setInterval(function () {
 
 
     const randomChange =
-        Math.floor(Math.random() * 5) - 2;
+        Math.floor(
+            Math.random() * 5
+        ) - 2;
 
 
     patientData.heartRate =
@@ -1872,132 +1449,249 @@ setInterval(function () {
     saveData();
 
     updateDashboard();
-   /* =========================================================
-   AI CAMERA HAND GESTURE DETECTION
+    updateHealthMonitor();
+    updateReport();
+    updateAIAnalysis();
+
+}, 5000);
+
+
+/* =========================================================
+   20. AI CAMERA HAND GESTURE DETECTION
    ========================================================= */
 
 let cameraStream = null;
+
 let handCamera = null;
+
 let lastAIGesture = "";
+
 let lastAIGestureTime = 0;
 
+let emergencyTriggeredByCamera = false;
 
-/* ================= START CAMERA ================= */
+
+/* =========================================================
+   START CAMERA
+   ========================================================= */
 
 async function startCamera() {
 
-    const video = document.getElementById("cameraVideo");
+    const video =
+        document.getElementById(
+            "cameraVideo"
+        );
+
 
     if (!video) {
-        console.error("Camera video element not found.");
+
+        alert(
+            "Camera video element was not found."
+        );
+
         return;
     }
 
+
     try {
 
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: "user",
-                width: { ideal: 640 },
-                height: { ideal: 480 }
-            },
-            audio: false
-        });
+        cameraStream =
+            await navigator.mediaDevices.getUserMedia({
 
-        video.srcObject = cameraStream;
+                video: {
+                    facingMode: "user"
+                },
+
+                audio: false
+
+            });
+
+
+        video.srcObject =
+            cameraStream;
+
 
         await video.play();
 
-        initializeHandAI();
 
-        updateCameraResult(
-            "✋",
-            "Camera Active",
-            "Show your hand in front of the camera.",
-            0
-        );
+        initializeHandDetection();
 
-    } catch (error) {
-
-        console.error("Camera error:", error);
-
-        updateCameraResult(
-            "⚠️",
-            "Camera Error",
-            "Please allow camera permission and try again.",
-            0
-        );
 
         alert(
-            "Camera access was blocked.\n\n" +
-            "Please allow camera permission in your browser."
+            "Camera started.\n\nShow your hand clearly in front of the camera."
         );
+
     }
+
+    catch (error) {
+
+        console.error(
+            "Camera error:",
+            error
+        );
+
+
+        alert(
+            "Unable to access the camera.\n\nPlease allow camera permission in your browser."
+        );
+
+    }
+
 }
 
 
-/* ================= STOP CAMERA ================= */
+/* =========================================================
+   STOP CAMERA
+   ========================================================= */
 
 function stopCamera() {
 
     if (cameraStream) {
 
-        cameraStream.getTracks().forEach(function(track) {
-            track.stop();
-        });
+        cameraStream
+            .getTracks()
+            .forEach(function (track) {
 
-        cameraStream = null;
+                track.stop();
+
+            });
+
+        cameraStream =
+            null;
+
     }
+
 
     if (handCamera) {
-        handCamera.stop();
-        handCamera = null;
+
+        try {
+
+            handCamera.stop();
+
+        }
+
+        catch (error) {
+
+            console.log(error);
+
+        }
+
+        handCamera =
+            null;
+
     }
 
-    const video = document.getElementById("cameraVideo");
+
+    const video =
+        document.getElementById(
+            "cameraVideo"
+        );
+
 
     if (video) {
-        video.srcObject = null;
+
+        video.srcObject =
+            null;
+
     }
 
-    updateCameraResult(
-        "✋",
-        "Camera Stopped",
-        "Press Start Camera to begin detection.",
-        0
-    );
+
+    const nameElement =
+        document.getElementById(
+            "cameraGestureName"
+        );
+
+
+    const meaningElement =
+        document.getElementById(
+            "cameraGestureMeaning"
+        );
+
+
+    const confidenceElement =
+        document.getElementById(
+            "cameraConfidence"
+        );
+
+
+    if (nameElement) {
+
+        nameElement.textContent =
+            "Camera stopped";
+
+    }
+
+
+    if (meaningElement) {
+
+        meaningElement.textContent =
+            "Start the camera to detect a hand gesture.";
+
+    }
+
+
+    if (confidenceElement) {
+
+        confidenceElement.textContent =
+            "0%";
+
+    }
+
+
+    lastAIGesture =
+        "";
+
+    emergencyTriggeredByCamera =
+        false;
+
 }
 
 
-/* ================= INITIALIZE MEDIAPIPE ================= */
+/* =========================================================
+   INITIALIZE MEDIAPIPE HAND DETECTION
+   ========================================================= */
 
-function initializeHandAI() {
+function initializeHandDetection() {
 
-    const video = document.getElementById("cameraVideo");
+    if (
+        typeof Hands === "undefined" ||
+        typeof Camera === "undefined"
+    ) {
 
-    if (!video) return;
-
-    if (typeof Hands === "undefined") {
-
-        updateCameraResult(
-            "⚠️",
-            "AI Library Error",
-            "Hand detection library could not be loaded.",
-            0
+        alert(
+            "AI hand detection library could not be loaded.\n\nCheck your internet connection."
         );
 
         return;
     }
 
-    const hands = new Hands({
-        locateFile: function(file) {
 
-            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+    const video =
+        document.getElementById(
+            "cameraVideo"
+        );
 
-        }
-    });
 
-    hands.setOptions({
+    if (!video) return;
+
+
+    handCamera =
+        new Hands({
+
+            locateFile:
+                function (file) {
+
+                    return (
+                        "https://cdn.jsdelivr.net/npm/@mediapipe/hands/" +
+                        file
+                    );
+
+                }
+
+        });
+
+
+    handCamera.setOptions({
 
         maxNumHands: 1,
 
@@ -2010,289 +1704,441 @@ function initializeHandAI() {
     });
 
 
-    hands.onResults(processHandResults);
+    handCamera.onResults(
+        processHandResults
+    );
 
 
-    handCamera = new Camera(video, {
+    const camera =
+        new Camera(
+            video,
+            {
 
-        onFrame: async function() {
+                onFrame:
+                    async function () {
 
-            await hands.send({
-                image: video
-            });
+                        if (!handCamera) return;
 
-        },
+                        await handCamera.send({
+                            image: video
+                        });
 
-        width: 640,
-        height: 480
+                    },
 
-    });
+                width: 640,
 
-    handCamera.start();
+                height: 480
+
+            }
+        );
+
+
+    camera.start();
+
 }
 
 
-/* ================= PROCESS HAND RESULTS ================= */
+/* =========================================================
+   PROCESS HAND RESULTS
+   ========================================================= */
 
 function processHandResults(results) {
 
-    if (!results.multiHandLandmarks ||
-        results.multiHandLandmarks.length === 0) {
+    if (
+        !results ||
+        !results.multiHandLandmarks ||
+        results.multiHandLandmarks.length === 0
+    ) {
 
         updateCameraResult(
-            "🔍",
-            "No Hand Detected",
-            "Place your hand clearly in front of the camera.",
-            0
+            "No hand detected",
+            "Show your hand clearly in front of the camera.",
+            "0%",
+            "✋"
         );
+
+        lastAIGesture =
+            "";
+
+        emergencyTriggeredByCamera =
+            false;
 
         return;
     }
 
 
-    const landmarks = results.multiHandLandmarks[0];
+    const landmarks =
+        results.multiHandLandmarks[0];
 
-    const gesture = recognizeHandGesture(landmarks);
+
+    const gesture =
+        recognizeHandGesture(
+            landmarks
+        );
 
 
     if (!gesture) {
 
         updateCameraResult(
-            "✋",
-            "Unknown Gesture",
+            "Unknown gesture",
             "Try one of the supported hand gestures.",
-            50
+            "0%",
+            "❓"
         );
 
         return;
     }
 
 
+    let confidence =
+        gesture.confidence;
+
+
     updateCameraResult(
-        gesture.icon,
+
         gesture.name,
+
         gesture.meaning,
-        gesture.confidence
+
+        confidence + "%",
+
+        gesture.icon
+
     );
 
 
-    if (gesture.confidence >= 75) {
+    handleAIGesture(
+        gesture.type
+    );
 
-        handleAIGesture(gesture.type);
-
-    }
 }
 
 
-/* ================= RECOGNIZE GESTURE ================= */
+/* =========================================================
+   HAND GESTURE RECOGNITION
+   ========================================================= */
 
-function recognizeHandGesture(landmarks) {
+function recognizeHandGesture(
+    landmarks
+) {
 
-    const index = isFingerExtended(
-        landmarks,
-        8,
-        6
-    );
-
-    const middle = isFingerExtended(
-        landmarks,
-        12,
-        10
-    );
-
-    const ring = isFingerExtended(
-        landmarks,
-        16,
-        14
-    );
-
-    const pinky = isFingerExtended(
-        landmarks,
-        20,
-        18
-    );
-
-    const thumb = isThumbExtended(
-        landmarks
-    );
+    const wrist =
+        landmarks[0];
 
 
-    /* OPEN PALM = WASHROOM */
+    const thumbTip =
+        landmarks[4];
+
+    const thumbIP =
+        landmarks[3];
+
+
+    const indexTip =
+        landmarks[8];
+
+    const indexPIP =
+        landmarks[6];
+
+
+    const middleTip =
+        landmarks[12];
+
+    const middlePIP =
+        landmarks[10];
+
+
+    const ringTip =
+        landmarks[16];
+
+    const ringPIP =
+        landmarks[14];
+
+
+    const pinkyTip =
+        landmarks[20];
+
+    const pinkyPIP =
+        landmarks[18];
+
+
+    const indexExtended =
+        isFingerExtended(
+            indexTip,
+            indexPIP
+        );
+
+
+    const middleExtended =
+        isFingerExtended(
+            middleTip,
+            middlePIP
+        );
+
+
+    const ringExtended =
+        isFingerExtended(
+            ringTip,
+            ringPIP
+        );
+
+
+    const pinkyExtended =
+        isFingerExtended(
+            pinkyTip,
+            pinkyPIP
+        );
+
+
+    const thumbExtended =
+        isThumbExtended(
+            wrist,
+            thumbTip,
+            thumbIP
+        );
+
+
+    const extendedCount =
+        [
+            indexExtended,
+            middleExtended,
+            ringExtended,
+            pinkyExtended
+        ]
+        .filter(Boolean)
+        .length;
+
+
+    /* =====================================================
+       OPEN PALM → WASHROOM
+       ===================================================== */
 
     if (
-        thumb &&
-        index &&
-        middle &&
-        ring &&
-        pinky
+        thumbExtended &&
+        indexExtended &&
+        middleExtended &&
+        ringExtended &&
+        pinkyExtended
     ) {
 
         return {
-            type: "washroom",
-            icon: "🚻",
-            name: "Washroom Request",
-            meaning: "Patient is requesting to go to the washroom.",
-            confidence: 92
+
+            type:
+                "washroom",
+
+            name:
+                "Washroom",
+
+            meaning:
+                "Patient needs assistance to use the washroom.",
+
+            icon:
+                "✋",
+
+            confidence:
+                94
+
         };
 
     }
 
 
-    /* TWO FINGERS = EMERGENCY */
+    /* =====================================================
+       TWO FINGERS → EMERGENCY
+       ===================================================== */
 
     if (
-        index &&
-        middle &&
-        !ring &&
-        !pinky
+        indexExtended &&
+        middleExtended &&
+        !ringExtended &&
+        !pinkyExtended
     ) {
 
         return {
-            type: "emergency",
-            icon: "🚨",
-            name: "Emergency",
-            meaning: "Patient has triggered an emergency request.",
-            confidence: 90
+
+            type:
+                "emergency",
+
+            name:
+                "Emergency",
+
+            meaning:
+                "Emergency assistance required.",
+
+            icon:
+                "✌️",
+
+            confidence:
+                91
+
         };
 
     }
 
 
-    /* THUMB UP = WATER */
+    /* =====================================================
+       THUMB ONLY → WATER
+       ===================================================== */
 
     if (
-        thumb &&
-        !index &&
-        !middle &&
-        !ring &&
-        !pinky
+        thumbExtended &&
+        !indexExtended &&
+        !middleExtended &&
+        !ringExtended &&
+        !pinkyExtended
     ) {
 
         return {
-            type: "water",
-            icon: "💧",
-            name: "Water Request",
-            meaning: "Patient is requesting water.",
-            confidence: 88
+
+            type:
+                "water",
+
+            name:
+                "Water",
+
+            meaning:
+                "Patient needs water.",
+
+            icon:
+                "👍",
+
+            confidence:
+                90
+
         };
 
     }
 
 
-    /* CLOSED FIST = FOOD */
+    /* =====================================================
+       FIST → FOOD
+       ===================================================== */
 
     if (
-        !thumb &&
-        !index &&
-        !middle &&
-        !ring &&
-        !pinky
+        !thumbExtended &&
+        extendedCount === 0
     ) {
 
         return {
-            type: "food",
-            icon: "🍎",
-            name: "Food Request",
-            meaning: "Patient is requesting food.",
-            confidence: 86
+
+            type:
+                "food",
+
+            name:
+                "Food",
+
+            meaning:
+                "Patient needs food.",
+
+            icon:
+                "✊",
+
+            confidence:
+                88
+
         };
 
     }
 
 
     return null;
+
 }
 
 
-/* ================= FINGER DETECTION ================= */
+/* =========================================================
+   FINGER EXTENSION
+   ========================================================= */
 
-function isFingerExtended(landmarks, tipIndex, pipIndex) {
-
-    const tip = landmarks[tipIndex];
-
-    const pip = landmarks[pipIndex];
-
-    return tip.y < pip.y;
-}
-
-
-/* ================= THUMB DETECTION ================= */
-
-function isThumbExtended(landmarks) {
-
-    const thumbTip = landmarks[4];
-
-    const thumbIP = landmarks[3];
-
-    const wrist = landmarks[0];
-
-    const tipDistance = Math.abs(
-        thumbTip.x - wrist.x
-    );
-
-    const ipDistance = Math.abs(
-        thumbIP.x - wrist.x
-    );
-
-    return tipDistance > ipDistance + 0.04;
-}
-
-
-/* ================= UPDATE CAMERA RESULT ================= */
-
-function updateCameraResult(
-    icon,
-    name,
-    meaning,
-    confidence
+function isFingerExtended(
+    tip,
+    pip
 ) {
 
-    const iconElement =
-        document.getElementById("cameraGestureIcon");
+    return (
+        tip.y <
+        pip.y
+    );
 
-    const nameElement =
-        document.getElementById("cameraGestureName");
-
-    const meaningElement =
-        document.getElementById("cameraGestureMeaning");
-
-    const confidenceElement =
-        document.getElementById("cameraConfidence");
-
-
-    if (iconElement) {
-        iconElement.textContent = icon;
-    }
-
-    if (nameElement) {
-        nameElement.textContent = name;
-    }
-
-    if (meaningElement) {
-        meaningElement.textContent = meaning;
-    }
-
-    if (confidenceElement) {
-        confidenceElement.textContent =
-            confidence + "%";
-    }
 }
 
 
-/* ================= HANDLE AI GESTURE ================= */
+/* =========================================================
+   THUMB EXTENSION
+   ========================================================= */
 
-function handleAIGesture(type) {
+function isThumbExtended(
+    wrist,
+    thumbTip,
+    thumbIP
+) {
 
-    const now = Date.now();
+    const distanceTip =
+        Math.sqrt(
+
+            Math.pow(
+                thumbTip.x -
+                wrist.x,
+                2
+            )
+
+            +
+
+            Math.pow(
+                thumbTip.y -
+                wrist.y,
+                2
+            )
+
+        );
+
+
+    const distanceIP =
+        Math.sqrt(
+
+            Math.pow(
+                thumbIP.x -
+                wrist.x,
+                2
+            )
+
+            +
+
+            Math.pow(
+                thumbIP.y -
+                wrist.y,
+                2
+            )
+
+        );
+
+
+    return (
+        distanceTip >
+        distanceIP * 1.15
+    );
+
+}
+
+
+/* =========================================================
+   HANDLE AI GESTURE
+   ========================================================= */
+
+function handleAIGesture(
+    gestureType
+) {
+
+    const now =
+        Date.now();
 
 
     /*
-       Prevent the same gesture from triggering
-       continuously every frame.
+       Prevent the same gesture from
+       triggering continuously.
     */
 
     if (
-        type === lastAIGesture &&
+        gestureType === lastAIGesture &&
         now - lastAIGestureTime < 3000
     ) {
 
@@ -2301,24 +2147,156 @@ function handleAIGesture(type) {
     }
 
 
-    lastAIGesture = type;
-
-    lastAIGestureTime = now;
-
-
     /*
-       Use your existing dashboard gesture system.
+       Emergency should only trigger
+       once until the user changes gesture.
     */
 
-    if (typeof detectGesture === "function") {
+    if (
+        gestureType === "emergency" &&
+        emergencyTriggeredByCamera
+    ) {
 
-        detectGesture(type);
+        return;
+
+    }
+
+
+    lastAIGesture =
+        gestureType;
+
+
+    lastAIGestureTime =
+        now;
+
+
+    if (
+        gestureType === "emergency"
+    ) {
+
+        emergencyTriggeredByCamera =
+            true;
+
+    }
+
+    else {
+
+        emergencyTriggeredByCamera =
+            false;
+
+    }
+
+
+    detectGesture(
+        gestureType
+    );
+
+}
+
+
+/* =========================================================
+   UPDATE CAMERA RESULT
+   ========================================================= */
+
+function updateCameraResult(
+    name,
+    meaning,
+    confidence,
+    icon
+) {
+
+    const iconElement =
+        document.getElementById(
+            "cameraGestureIcon"
+        );
+
+
+    const nameElement =
+        document.getElementById(
+            "cameraGestureName"
+        );
+
+
+    const meaningElement =
+        document.getElementById(
+            "cameraGestureMeaning"
+        );
+
+
+    const confidenceElement =
+        document.getElementById(
+            "cameraConfidence"
+        );
+
+
+    if (iconElement) {
+
+        iconElement.textContent =
+            icon;
+
+    }
+
+
+    if (nameElement) {
+
+        nameElement.textContent =
+            name;
+
+    }
+
+
+    if (meaningElement) {
+
+        meaningElement.textContent =
+            meaning;
+
+    }
+
+
+    if (confidenceElement) {
+
+        confidenceElement.textContent =
+            confidence;
 
     }
 
 }
 
-    updateReport();
+
+/* =========================================================
+   21. WINDOW CLICK
+   Close popups when clicking outside
+   ========================================================= */
+
+window.addEventListener(
+    "click",
+    function (event) {
+
+        const popups =
+            document.querySelectorAll(
+                ".popup, .modal"
+            );
 
 
-}, 5000);
+        popups.forEach(
+            function (popup) {
+
+                if (
+                    event.target === popup
+                ) {
+
+                    popup.style.display =
+                        "none";
+
+                }
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   END OF SCRIPT
+   ========================================================= */
