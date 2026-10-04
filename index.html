@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PatientCare AI Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-icon">✚</div>
+            <div>
+                <h2>PatientCare</h2>
+                <span>AI Healthcare</span>
+            </div>
+        </div>
+
+        <nav>
+
+            <a href="#" class="nav-item active" data-section="dashboardSection">
+                🏠 <span>Dashboard</span>
+            </a>
+
+            <a href="#" class="nav-item" data-section="patientsSection">
+                👥 <span>Patients</span>
+            </a>
+
+            <a href="#" class="nav-item" data-section="doctorsSection">
+                👨‍⚕️ <span>Doctors</span>
+            </a>
+
+            <a href="#" class="nav-item" data-section="healthSection">
+                ❤️ <span>Health Monitor</span>
+            </a>
+
+            <a href="#" class="nav-item" data-section="alertsSection">
+                🚨 <span>Alerts</span>
+            </a>
+
+            <a href="#" class="nav-item" data-section="reportsSection">
+                📊 <span>Reports</span>
+            </a>
+
+            <a href="#" class="nav-item" data-section="settingsSection">
+                ⚙️ <span>Settings</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="system-status">
+                <span class="online-dot"></span>
+                System Online
+            </div>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- HEADER -->
+        <header class="topbar">
+
+            <div>
+                <h1 id="pageTitle">Dashboard</h1>
+                <p id="pageSubtitle">AI-powered patient monitoring</p>
+            </div>
+
+            <div class="doctor-area">
+
+                <div class="notification">
+                    🔔
+                    <span id="notificationCount">0</span>
+                </div>
+
+                <div class="doctor-profile" id="doctorProfile">
+                    <div class="doctor-avatar">SW</div>
+
+                    <div>
+                        <strong id="headerDoctorName">Dr. Sarah Wilson</strong>
+                        <small>Neurologist</small>
+                    </div>
+
+                    <span>⌄</span>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- ================= DASHBOARD ================= -->
+
+        <section id="dashboardSection" class="page-section active-section">
+
+            <div class="welcome">
+                <div>
+                    <h2>Patient Dashboard</h2>
+                    <p>Real-time AI monitoring of your patient's condition.</p>
+                </div>
+
+                <div class="glove-status">
+                    <span class="online-dot"></span>
+                    Glove Connected
+                </div>
+            </div>
+
+
+            <!-- PATIENT PROFILE -->
+
+            <div class="patient-profile-card">
+
+                <div class="patient-avatar">
+                    👤
+                </div>
+
+                <div class="patient-info">
+                    <h2 id="dashboardPatientName">John Doe</h2>
+
+                    <p>
+                        Patient ID:
+                        <strong id="dashboardPatientId">P001</strong>
+                    </p>
+
+                    <p>
+                        Age:
+                        <strong id="dashboardPatientAge">42</strong>
+                    </p>
+
+                    <p>
+                        Condition:
+                        <strong id="dashboardPatientCondition">Paralysis</strong>
+                    </p>
+                </div>
+
+                <div class="patient-glove">
+                    <span class="online-dot"></span>
+                    <strong>Glove Connected</strong>
+                    <small id="lastUpdated">Updated just now</small>
+                </div>
+
+            </div>
+
+
+            <!-- HEALTH CARDS -->
+
+            <div class="health-grid">
+
+                <div class="health-card">
+                    <div class="health-icon heart">♥</div>
+                    <div>
+                        <span>Heart Rate</span>
+                        <h2><span id="heartRate">72</span> <small>BPM</small></h2>
+                    </div>
+                </div>
+
+                <div class="health-card">
+                    <div class="health-icon oxygen">O₂</div>
+                    <div>
+                        <span>SpO₂</span>
+                        <h2><span id="spo2">97</span> <small>%</small></h2>
+                    </div>
+                </div>
+
+                <div class="health-card">
+                    <div class="health-icon temperature">🌡</div>
+                    <div>
+                        <span>Temperature</span>
+                        <h2><span id="temperature">36.5</span> <small>°C</small></h2>
+                    </div>
+                </div>
+
+                <div class="health-card">
+                    <div class="health-icon pressure">🩺</div>
+                    <div>
+                        <span>Blood Pressure</span>
+                        <h2 id="bloodPressure">118/76</h2>
+                        <small>mmHg</small>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- AI ANALYSIS -->
+
+            <div class="ai-card">
+
+                <div class="section-heading">
+                    <div>
+                        <h2>🤖 AI Patient Analysis</h2>
+                        <p>Intelligent analysis based on real-time health data</p>
+                    </div>
+
+                    <button class="primary-btn" onclick="analyzePatient()">
+                        Analyze Now
+                    </button>
+                </div>
+
+                <div class="ai-grid">
+
+                    <div class="ai-status-box" id="aiStatusBox">
+
+                        <div class="ai-big-icon" id="aiStatusIcon">
+                            ✓
+                        </div>
+
+                        <div>
+                            <span>Current Risk Level</span>
+                            <h2 id="aiRiskLevel">LOW RISK</h2>
+                        </div>
+
+                    </div>
+
+
+                    <div class="ai-info">
+                        <span>Patient Status</span>
+                        <strong id="patientStatus">Stable</strong>
+                    </div>
+
+
+                    <div class="ai-info">
+                        <span>Monitoring</span>
+                        <strong>Active</strong>
+                    </div>
+
+
+                    <div class="ai-info">
+                        <span>AI Confidence</span>
+                        <strong>94%</strong>
+                    </div>
+
+                </div>
+
+                <div class="recommendation" id="aiRecommendation">
+                    AI recommends continuing normal monitoring.
+                </div>
+
+            </div>
+
+
+            <!-- LOWER GRID -->
+
+            <div class="dashboard-grid">
+
+                <!-- HEALTH TREND -->
+
+                <div class="panel">
+
+                    <div class="section-heading">
+                        <div>
+                            <h2>Health Trend</h2>
+                            <p>Heart rate monitoring</p>
+                        </div>
+
+                        <select id="timeRange">
+                            <option>Today</option>
+                            <option>7 Days</option>
+                            <option>30 Days</option>
+                        </select>
+                    </div>
+
+                    <div class="chart">
+
+                        <svg viewBox="0 0 600 220">
+
+                            <polyline
+                                points="0,150 60,130 120,145 180,100 240,120 300,90 360,110 420,80 480,100 540,70 600,90"
+                                fill="none"
+                                stroke="#2563eb"
+                                stroke-width="4"
+                            />
+
+                        </svg>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PATIENT REQUEST -->
+
+                <div class="panel">
+
+                    <div class="section-heading">
+                        <div>
+                            <h2>Patient Request</h2>
+                            <p>Latest detected request</p>
+                        </div>
+                    </div>
+
+                    <div class="request-box">
+
+                        <div class="request-icon">
+                            💧
+                        </div>
+
+                        <div>
+                            <h3 id="requestText">Patient needs water</h3>
+                            <p>Detected through glove gesture</p>
+                        </div>
+
+                    </div>
+
+                    <button class="secondary-btn" onclick="acknowledgeRequest()">
+                        Acknowledge Request
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- GESTURE -->
+
+            <div class="panel gesture-panel">
+
+                <div class="section-heading">
+
+                    <div>
+                        <h2>✋ Gesture Recognition</h2>
+                        <p>AI interpretation of patient hand gestures</p>
+                    </div>
+
+                    <span class="ai-badge">AI ACTIVE</span>
+
+                </div>
+
+                <div class="gesture-result">
+
+                    <div class="gesture-big-icon" id="gestureIcon">
+                        💧
+                    </div>
+
+                    <div>
+                        <h2 id="gestureName">Water</h2>
+                        <p id="gestureMeaning">Patient needs water</p>
+                        <small id="gestureTime">Detected just now</small>
+                    </div>
+
+                </div>
+
+                <div class="gesture-buttons">
+
+                    <button onclick="detectGesture('water')">
+                        💧 Water
+                    </button>
+
+                    <button onclick="detectGesture('food')">
+                        🍎 Food
+                    </button>
+
+                    <button onclick="detectGesture('washroom')">
+                        🚻 Washroom
+                    </button>
+
+                    <button onclick="detectGesture('emergency')">
+                        🚨 Emergency
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- EMERGENCY -->
+
+            <div class="emergency-panel">
+
+                <div>
+
+                    <h2>🚨 Emergency Alerts</h2>
+
+                    <p id="normalAlert">
+                        No Emergency Alerts
+                    </p>
+
+                    <p id="emergencyAlert" class="hidden">
+                        Emergency gesture detected!
+                    </p>
+
+                </div>
+
+                <div class="alert-right">
+
+                    <strong id="alertCount">0</strong>
+
+                    <small>Active Alerts</small>
+
+                    <button
+                        id="resolveButton"
+                        class="resolve-btn hidden"
+                        onclick="resolveEmergency()"
+                    >
+                        Resolve
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= PATIENTS ================= -->
+
+        <section id="patientsSection" class="page-section">
+
+            <div class="section-top">
+
+                <div>
+                    <h2>Patients</h2>
+                    <p>Manage registered patients</p>
+                </div>
+
+                <button class="primary-btn" onclick="openPatientModal()">
+                    + Add Patient
+                </button>
+
+            </div>
+
+            <div id="patientsList" class="people-grid"></div>
+
+        </section>
+
+
+        <!-- ================= DOCTORS ================= -->
+
+        <section id="doctorsSection" class="page-section">
+
+            <div class="section-top">
+
+                <div>
+                    <h2>Doctors</h2>
+                    <p>Manage doctors and medical staff</p>
+                </div>
+
+                <button class="primary-btn" onclick="openDoctorModal()">
+                    + Add Doctor
+                </button>
+
+            </div>
+
+            <div id="doctorsList" class="people-grid"></div>
+
+        </section>
+
+
+        <!-- ================= HEALTH MONITOR ================= -->
+
+        <section id="healthSection" class="page-section">
+
+            <div class="section-top">
+
+                <div>
+                    <h2>Health Monitor</h2>
+                    <p>Live health information for selected patient</p>
+                </div>
+
+                <span class="live-badge">
+                    ● LIVE
+                </span>
+
+            </div>
+
+            <div class="monitor-grid">
+
+                <div class="monitor-card">
+                    <span>❤️ Heart Rate</span>
+                    <strong><span id="monitorHeartRate">72</span> BPM</strong>
+                </div>
+
+                <div class="monitor-card">
+                    <span>🫁 Oxygen</span>
+                    <strong><span id="monitorSpo2">97</span>%</strong>
+                </div>
+
+                <div class="monitor-card">
+                    <span>🌡 Temperature</span>
+                    <strong><span id="monitorTemperature">36.5</span> °C</strong>
+                </div>
+
+                <div class="monitor-card">
+                    <span>🩺 Blood Pressure</span>
+                    <strong id="monitorBloodPressure">118/76</strong>
+                </div>
+
+            </div>
+
+            <div class="panel monitor-info">
+
+                <h2>Current Patient</h2>
+
+                <p id="monitorPatientName">
+                    John Doe
+                </p>
+
+                <p>
+                    The glove is continuously sending patient data
+                    to the AI monitoring system.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= ALERTS ================= -->
+
+        <section id="alertsSection" class="page-section">
+
+            <div class="section-top">
+
+                <div>
+                    <h2>Alerts</h2>
+                    <p>Emergency and health alerts</p>
+                </div>
+
+            </div>
+
+            <div id="alertsList">
+
+                <div class="empty-alert">
+                    ✓ No active alerts
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= REPORTS ================= -->
+
+        <section id="reportsSection" class="page-section">
+
+            <div class="section-top">
+
+                <div>
+                    <h2>Reports</h2>
+                    <p>Patient health reports</p>
+                </div>
+
+                <button class="primary-btn" onclick="generateReport()">
+                    Generate Report
+                </button>
+
+            </div>
+
+            <div class="report-card">
+
+                <h2>Patient Health Report</h2>
+
+                <p>
+                    Selected Patient:
+                    <strong id="reportPatientName">
+                        John Doe
+                    </strong>
+                </p>
+
+                <div class="report-values">
+
+                    <div>
+                        <span>Heart Rate</span>
+                        <strong id="reportHeartRate">72 BPM</strong>
+                    </div>
+
+                    <div>
+                        <span>SpO₂</span>
+                        <strong id="reportSpo2">97%</strong>
+                    </div>
+
+                    <div>
+                        <span>Temperature</span>
+                        <strong id="reportTemperature">36.5 °C</strong>
+                    </div>
+
+                    <div>
+                        <span>Blood Pressure</span>
+                        <strong id="reportBloodPressure">118/76</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= SETTINGS ================= -->
+
+        <section id="settingsSection" class="page-section">
+
+            <div class="section-top">
+
+                <div>
+                    <h2>Settings</h2>
+                    <p>Dashboard configuration</p>
+                </div>
+
+            </div>
+
+            <div class="settings-card">
+
+                <h3>System Settings</h3>
+
+                <label>
+                    <input type="checkbox" checked>
+                    Enable AI monitoring
+                </label>
+
+                <label>
+                    <input type="checkbox" checked>
+                    Enable emergency notifications
+                </label>
+
+                <label>
+                    <input type="checkbox" checked>
+                    Enable glove connection monitoring
+                </label>
+
+            </div>
+
+            <div class="demo-warning">
+                ⚠️ <strong>Demo System:</strong>
+                This dashboard is a prototype for the AI Adaptive Patient-Care
+                Glove project. Patient information is stored only in this
+                browser and is not suitable for real medical use.
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- ================= DOCTOR PROFILE POPUP ================= -->
+
+<div class="popup" id="doctorPopup">
+
+    <div class="popup-box">
+
+        <button class="close-popup" onclick="closeDoctorProfile()">
+            ×
+        </button>
+
+        <div class="doctor-avatar large">
+            SW
+        </div>
+
+        <h2 id="popupDoctorName">Dr. Sarah Wilson</h2>
+
+        <p id="popupDoctorSpecialty">Neurologist</p>
+
+        <p id="popupDoctorEmail">
+            sarah.wilson@patientcare.com
+        </p>
+
+        <button class="primary-btn" onclick="goToDoctors()">
+            Manage Doctors
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ================= PATIENT MODAL ================= -->
+
+<div class="modal" id="patientModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2 id="patientModalTitle">
+                Add Patient
+            </h2>
+
+            <button onclick="closePatientModal()">×</button>
+
+        </div>
+
+        <form id="patientForm">
+
+            <input type="hidden" id="editPatientIndex">
+
+            <label>
+                Patient Name
+                <input
+                    type="text"
+                    id="patientNameInput"
+                    placeholder="Example: John Doe"
+                    required
+                >
+            </label>
+
+            <label>
+                Patient ID
+                <input
+                    type="text"
+                    id="patientIdInput"
+                    placeholder="Example: P001"
+                >
+            </label>
+
+            <label>
+                Age
+                <input
+                    type="number"
+                    id="patientAgeInput"
+                    min="1"
+                    max="120"
+                    required
+                >
+            </label>
+
+            <label>
+                Condition
+                <input
+                    type="text"
+                    id="patientConditionInput"
+                    placeholder="Example: Paralysis"
+                    required
+                >
+            </label>
+
+            <label>
+                Glove Status
+
+                <select id="patientGloveInput">
+
+                    <option value="Connected">
+                        Connected
+                    </option>
+
+                    <option value="Disconnected">
+                        Disconnected
+                    </option>
+
+                </select>
+
+            </label>
+
+            <div class="form-buttons">
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    onclick="closePatientModal()"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                >
+                    Save Patient
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ================= DOCTOR MODAL ================= -->
+
+<div class="modal" id="doctorModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2 id="doctorModalTitle">
+                Add Doctor
+            </h2>
+
+            <button onclick="closeDoctorModal()">×</button>
+
+        </div>
+
+        <form id="doctorForm">
+
+            <input type="hidden" id="editDoctorIndex">
+
+            <label>
+                Doctor Name
+                <input
+                    type="text"
+                    id="doctorNameInput"
+                    placeholder="Example: Dr. Sarah Wilson"
+                    required
+                >
+            </label>
+
+            <label>
+                Doctor ID
+                <input
+                    type="text"
+                    id="doctorIdInput"
+                    placeholder="Example: D001"
+                >
+            </label>
+
+            <label>
+                Specialty
+                <input
+                    type="text"
+                    id="doctorSpecialtyInput"
+                    placeholder="Example: Neurologist"
+                    required
+                >
+            </label>
+
+            <label>
+                Email
+                <input
+                    type="email"
+                    id="doctorEmailInput"
+                    placeholder="doctor@example.com"
+                    required
+                >
+            </label>
+
+            <label>
+                Department
+                <input
+                    type="text"
+                    id="doctorDepartmentInput"
+                    placeholder="Example: Neurology"
+                    required
+                >
+            </label>
+
+            <div class="form-buttons">
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    onclick="closeDoctorModal()"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                >
+                    Save Doctor
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
