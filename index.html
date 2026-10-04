@@ -370,7 +370,73 @@
 
                 </div>
 
-            </div>
+            </div> 
+            <!-- ================= AI CAMERA GESTURE ================= -->
+
+<div class="panel camera-panel">
+
+    <div class="section-heading">
+        <div>
+            <h2>📷 AI Hand Gesture Camera</h2>
+            <p>Patient shows a hand gesture to the camera</p>
+        </div>
+
+        <span class="ai-badge">AI ACTIVE</span>
+    </div>
+
+    <div class="camera-container">
+        <video id="cameraVideo" autoplay playsinline muted></video>
+        <canvas id="cameraCanvas"></canvas>
+    </div>
+
+    <div class="camera-controls">
+
+        <button
+            id="startCameraButton"
+            class="primary-btn"
+            onclick="startCamera()">
+            📷 Start Camera
+        </button>
+
+        <button
+            id="stopCameraButton"
+            class="secondary-btn"
+            onclick="stopCamera()">
+            ⏹ Stop Camera
+        </button>
+
+    </div>
+
+    <div class="gesture-ai-result">
+
+        <div
+            class="camera-gesture-icon"
+            id="cameraGestureIcon">
+            ✋
+        </div>
+
+        <div>
+
+            <span>AI Detection</span>
+
+            <h2 id="cameraGestureName">
+                Show your hand
+            </h2>
+
+            <p id="cameraGestureMeaning">
+                Start the camera and show a hand gesture.
+            </p>
+
+            <small>
+                Confidence:
+                <strong id="cameraConfidence">0%</strong>
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
 
 
             <!-- EMERGENCY -->
@@ -872,6 +938,12 @@
 
 </div>
 
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
 
 <script src="script.js"></script>
 
