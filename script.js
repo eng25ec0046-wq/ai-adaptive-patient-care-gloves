@@ -1,6 +1,6 @@
 /* =========================================================
    AI ADAPTIVE PATIENT-CARE GLOVE
-   DASHBOARD JAVASCRIPT
+   COMPLETE DASHBOARD JAVASCRIPT
    ========================================================= */
 
 
@@ -11,6 +11,7 @@
 let patientData = JSON.parse(localStorage.getItem("patientData"));
 
 if (!patientData) {
+
     patientData = {
         name: "Rahul Kumar",
         age: 28,
@@ -35,29 +36,34 @@ if (!patientData) {
 }
 
 
-let patients = JSON.parse(localStorage.getItem("patients"));
+let patients =
+    JSON.parse(localStorage.getItem("patients"));
 
 if (!patients) {
 
     patients = [
+
         {
             id: 1,
             name: "Rahul Kumar",
             age: 28,
             condition: "Paralysis / Limited Hand Movement"
         },
+
         {
             id: 2,
             name: "Ananya Sharma",
             age: 35,
             condition: "Spinal Cord Injury"
         },
+
         {
             id: 3,
             name: "Arjun Patel",
             age: 42,
             condition: "Stroke Recovery"
         }
+
     ];
 
     localStorage.setItem(
@@ -67,23 +73,27 @@ if (!patients) {
 }
 
 
-let doctors = JSON.parse(localStorage.getItem("doctors"));
+let doctors =
+    JSON.parse(localStorage.getItem("doctors"));
 
 if (!doctors) {
 
     doctors = [
+
         {
             id: 1,
             name: "Dr. Priya Sharma",
             specialization: "Neurologist",
             phone: "+91 9876543210"
         },
+
         {
             id: 2,
             name: "Dr. Arjun Rao",
             specialization: "Emergency Physician",
             phone: "+91 9876543211"
         }
+
     ];
 
     localStorage.setItem(
@@ -94,10 +104,15 @@ if (!doctors) {
 
 
 let selectedPatientId =
-    Number(localStorage.getItem("selectedPatientId")) || 1;
+    Number(
+        localStorage.getItem("selectedPatientId")
+    ) || 1;
+
 
 let selectedDoctorId =
-    Number(localStorage.getItem("selectedDoctorId")) || 1;
+    Number(
+        localStorage.getItem("selectedDoctorId")
+    ) || 1;
 
 
 /* =========================================================
@@ -137,20 +152,23 @@ function saveData() {
    3. INITIALIZATION
    ========================================================= */
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
-    updateDashboard();
-    updatePatients();
-    updateDoctors();
-    updateHealthMonitor();
-    updateAlerts();
-    updateReport();
-    updateAIAnalysis();
-    updateDoctorProfile();
+        updateDashboard();
+        updatePatients();
+        updateDoctors();
+        updateHealthMonitor();
+        updateAlerts();
+        updateReport();
+        updateAIAnalysis();
+        updateDoctorProfile();
 
-    showSection("dashboard");
+        showSection("dashboard");
 
-});
+    }
+);
 
 
 /* =========================================================
@@ -159,10 +177,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function showSection(sectionName) {
 
-    const sections = document.querySelectorAll(".section");
+    const sections =
+        document.querySelectorAll(".section");
 
     sections.forEach(function (section) {
+
         section.style.display = "none";
+
     });
 
 
@@ -170,7 +191,10 @@ function showSection(sectionName) {
         document.getElementById(sectionName);
 
     if (selectedSection) {
-        selectedSection.style.display = "block";
+
+        selectedSection.style.display =
+            "block";
+
     }
 
 
@@ -178,7 +202,9 @@ function showSection(sectionName) {
         document.querySelectorAll(".nav-item");
 
     navItems.forEach(function (item) {
+
         item.classList.remove("active");
+
     });
 
 
@@ -189,8 +215,14 @@ function showSection(sectionName) {
                 .trim()
                 .toLowerCase();
 
-        if (text.includes(sectionName.toLowerCase())) {
+        if (
+            text.includes(
+                sectionName.toLowerCase()
+            )
+        ) {
+
             item.classList.add("active");
+
         }
 
     });
@@ -199,45 +231,59 @@ function showSection(sectionName) {
 
 
 /* =========================================================
-   5. GET CURRENT PATIENT
+   5. CURRENT PATIENT
    ========================================================= */
 
 function getCurrentPatient() {
 
     const patient =
         patients.find(function (p) {
-            return Number(p.id) === Number(selectedPatientId);
+
+            return Number(p.id) ===
+                Number(selectedPatientId);
+
         });
 
+
     if (patient) {
+
         return patient;
+
     }
+
 
     return patients[0];
 }
 
 
 /* =========================================================
-   6. GET CURRENT DOCTOR
+   6. CURRENT DOCTOR
    ========================================================= */
 
 function getCurrentDoctor() {
 
     const doctor =
         doctors.find(function (d) {
-            return Number(d.id) === Number(selectedDoctorId);
+
+            return Number(d.id) ===
+                Number(selectedDoctorId);
+
         });
 
+
     if (doctor) {
+
         return doctor;
+
     }
+
 
     return doctors[0];
 }
 
 
 /* =========================================================
-   7. UPDATE DASHBOARD
+   7. DASHBOARD
    ========================================================= */
 
 function updateDashboard() {
@@ -248,119 +294,130 @@ function updateDashboard() {
     if (!patient) return;
 
 
-    /* Patient name */
-
     const patientName =
         document.getElementById("patientName");
 
     if (patientName) {
+
         patientName.textContent =
             patient.name;
+
     }
 
-
-    /* Patient age */
 
     const patientAge =
         document.getElementById("patientAge");
 
     if (patientAge) {
+
         patientAge.textContent =
             patient.age + " years";
+
     }
 
-
-    /* Patient condition */
 
     const patientCondition =
-        document.getElementById("patientCondition");
+        document.getElementById(
+            "patientCondition"
+        );
 
     if (patientCondition) {
+
         patientCondition.textContent =
             patient.condition;
+
     }
 
-
-    /* Heart rate */
 
     const heartRate =
         document.getElementById("heartRate");
 
     if (heartRate) {
+
         heartRate.textContent =
             patientData.heartRate;
+
     }
 
-
-    /* SpO2 */
 
     const spo2 =
         document.getElementById("spo2");
 
     if (spo2) {
+
         spo2.textContent =
             patientData.spo2;
+
     }
 
-
-    /* Temperature */
 
     const temperature =
         document.getElementById("temperature");
 
     if (temperature) {
+
         temperature.textContent =
             patientData.temperature.toFixed(1);
+
     }
 
-
-    /* Blood pressure */
 
     const bloodPressure =
-        document.getElementById("bloodPressure");
+        document.getElementById(
+            "bloodPressure"
+        );
 
     if (bloodPressure) {
+
         bloodPressure.textContent =
             patientData.bloodPressure;
+
     }
 
 
-    /* Request */
-
     const request =
-        document.getElementById("patientRequest");
+        document.getElementById(
+            "patientRequest"
+        );
 
     if (request) {
+
         request.textContent =
             patientData.request;
+
     }
 
 
     const requestTime =
-        document.getElementById("requestTime");
+        document.getElementById(
+            "requestTime"
+        );
 
     if (requestTime) {
+
         requestTime.textContent =
             patientData.requestTime;
+
     }
 
-
-    /* Emergency */
 
     updateEmergencyDisplay();
 
     updateAIAnalysis();
+
 }
 
 
 /* =========================================================
-   8. PATIENTS
+   8. PATIENT LIST
    ========================================================= */
 
 function updatePatients() {
 
     const container =
-        document.getElementById("patientsList");
+        document.getElementById(
+            "patientsList"
+        );
 
     if (!container) return;
 
@@ -380,7 +437,10 @@ function updatePatients() {
         card.innerHTML = `
 
             <div>
-                <h3>${patient.name}</h3>
+
+                <h3>
+                    ${patient.name}
+                </h3>
 
                 <p>
                     Age: ${patient.age}
@@ -389,6 +449,7 @@ function updatePatients() {
                 <p>
                     ${patient.condition}
                 </p>
+
             </div>
 
             <div class="patient-actions">
@@ -418,7 +479,7 @@ function updatePatients() {
 
 
 /* =========================================================
-   SELECT PATIENT
+   9. SELECT PATIENT
    ========================================================= */
 
 function selectPatient(id) {
@@ -429,7 +490,10 @@ function selectPatient(id) {
 
     const selected =
         patients.find(function (p) {
-            return Number(p.id) === Number(id);
+
+            return Number(p.id) ===
+                Number(id);
+
         });
 
 
@@ -454,14 +518,13 @@ function selectPatient(id) {
     updateReport();
     updateAIAnalysis();
 
-
     showSection("dashboard");
 
 }
 
 
 /* =========================================================
-   ADD PATIENT
+   10. ADD PATIENT
    ========================================================= */
 
 function addPatient() {
@@ -479,33 +542,30 @@ function addPatient() {
 
 
     const condition =
-        prompt("Enter patient condition:");
+        prompt(
+            "Enter patient condition:"
+        );
 
     if (!condition) return;
 
 
-    const newPatient = {
+    patients.push({
 
-        id:
-            Date.now(),
+        id: Date.now(),
 
-        name:
-            name,
+        name: name,
 
-        age:
-            Number(age),
+        age: Number(age),
 
-        condition:
-            condition
+        condition: condition
 
-    };
+    });
 
-
-    patients.push(newPatient);
 
     saveData();
 
     updatePatients();
+
 
     alert(
         "Patient added successfully."
@@ -515,7 +575,7 @@ function addPatient() {
 
 
 /* =========================================================
-   DELETE PATIENT
+   11. DELETE PATIENT
    ========================================================= */
 
 function deletePatient(id) {
@@ -527,6 +587,7 @@ function deletePatient(id) {
         );
 
         return;
+
     }
 
 
@@ -542,25 +603,32 @@ function deletePatient(id) {
     patients =
         patients.filter(function (patient) {
 
-            return Number(patient.id)
-                !== Number(id);
+            return Number(patient.id) !==
+                Number(id);
 
         });
 
 
-    if (Number(selectedPatientId) === Number(id)) {
+    if (
+        Number(selectedPatientId) ===
+        Number(id)
+    ) {
 
         selectedPatientId =
             patients[0].id;
 
+
         patientData.name =
             patients[0].name;
+
 
         patientData.age =
             patients[0].age;
 
+
         patientData.condition =
             patients[0].condition;
+
     }
 
 
@@ -575,13 +643,15 @@ function deletePatient(id) {
 
 
 /* =========================================================
-   9. DOCTORS
+   12. DOCTORS
    ========================================================= */
 
 function updateDoctors() {
 
     const container =
-        document.getElementById("doctorsList");
+        document.getElementById(
+            "doctorsList"
+        );
 
     if (!container) return;
 
@@ -616,7 +686,6 @@ function updateDoctors() {
 
             </div>
 
-
             <div class="doctor-actions">
 
                 <button
@@ -644,7 +713,7 @@ function updateDoctors() {
 
 
 /* =========================================================
-   SELECT DOCTOR
+   13. SELECT DOCTOR
    ========================================================= */
 
 function selectDoctor(id) {
@@ -656,6 +725,7 @@ function selectDoctor(id) {
 
     updateDoctorProfile();
 
+
     alert(
         "Doctor selected successfully."
     );
@@ -664,7 +734,7 @@ function selectDoctor(id) {
 
 
 /* =========================================================
-   ADD DOCTOR
+   14. ADD DOCTOR
    ========================================================= */
 
 function addDoctor() {
@@ -676,30 +746,31 @@ function addDoctor() {
 
 
     const specialization =
-        prompt("Enter specialization:");
+        prompt(
+            "Enter specialization:"
+        );
 
     if (!specialization) return;
 
 
     const phone =
-        prompt("Enter phone number:");
+        prompt(
+            "Enter phone number:"
+        );
 
     if (!phone) return;
 
 
     doctors.push({
 
-        id:
-            Date.now(),
+        id: Date.now(),
 
-        name:
-            name,
+        name: name,
 
         specialization:
             specialization,
 
-        phone:
-            phone
+        phone: phone
 
     });
 
@@ -712,7 +783,7 @@ function addDoctor() {
 
 
 /* =========================================================
-   DELETE DOCTOR
+   15. DELETE DOCTOR
    ========================================================= */
 
 function deleteDoctor(id) {
@@ -724,6 +795,7 @@ function deleteDoctor(id) {
         );
 
         return;
+
     }
 
 
@@ -739,13 +811,16 @@ function deleteDoctor(id) {
     doctors =
         doctors.filter(function (doctor) {
 
-            return Number(doctor.id)
-                !== Number(id);
+            return Number(doctor.id) !==
+                Number(id);
 
         });
 
 
-    if (Number(selectedDoctorId) === Number(id)) {
+    if (
+        Number(selectedDoctorId) ===
+        Number(id)
+    ) {
 
         selectedDoctorId =
             doctors[0].id;
@@ -763,7 +838,7 @@ function deleteDoctor(id) {
 
 
 /* =========================================================
-   10. DOCTOR PROFILE
+   16. DOCTOR PROFILE
    ========================================================= */
 
 function updateDoctorProfile() {
@@ -775,7 +850,9 @@ function updateDoctorProfile() {
 
 
     const doctorName =
-        document.getElementById("doctorName");
+        document.getElementById(
+            "doctorName"
+        );
 
     if (doctorName) {
 
@@ -801,7 +878,7 @@ function updateDoctorProfile() {
 
 
 /* =========================================================
-   11. HEALTH MONITOR
+   17. HEALTH MONITOR
    ========================================================= */
 
 function updateHealthMonitor() {
@@ -864,7 +941,7 @@ function updateHealthMonitor() {
 
 
 /* =========================================================
-   12. AI PATIENT ANALYSIS
+   18. AI PATIENT ANALYSIS
    ========================================================= */
 
 function updateAIAnalysis() {
@@ -890,11 +967,17 @@ function updateAIAnalysis() {
 
 
     if (
+
         hr < 55 ||
+
         hr > 105 ||
+
         oxygen < 94 ||
+
         temp > 38 ||
+
         temp < 35
+
     ) {
 
         risk =
@@ -908,11 +991,17 @@ function updateAIAnalysis() {
 
     }
 
+
     else if (
+
         hr < 60 ||
+
         hr > 100 ||
+
         oxygen < 96 ||
+
         temp > 37.5
+
     ) {
 
         risk =
@@ -961,16 +1050,14 @@ function updateAIAnalysis() {
 
 
 /* =========================================================
-   13. MANUAL GESTURE BUTTONS
+   19. GESTURE DETECTION
    ========================================================= */
 
 function detectGesture(gesture) {
 
-    let message =
-        "";
+    let message = "";
 
-    let icon =
-        "✋";
+    let icon = "✋";
 
 
     if (gesture === "water") {
@@ -1014,6 +1101,7 @@ function detectGesture(gesture) {
         icon =
             "✌️";
 
+
         triggerEmergency();
 
     }
@@ -1021,6 +1109,7 @@ function detectGesture(gesture) {
 
     patientData.request =
         message;
+
 
     patientData.requestTime =
         new Date().toLocaleTimeString();
@@ -1036,10 +1125,12 @@ function detectGesture(gesture) {
             "cameraGestureIcon"
         );
 
+
     const nameElement =
         document.getElementById(
             "cameraGestureName"
         );
+
 
     const meaningElement =
         document.getElementById(
@@ -1074,7 +1165,7 @@ function detectGesture(gesture) {
 
 
 /* =========================================================
-   14. EMERGENCY
+   20. EMERGENCY
    ========================================================= */
 
 function triggerEmergency() {
@@ -1082,12 +1173,16 @@ function triggerEmergency() {
     patientData.emergency =
         true;
 
+
     patientData.emergencyCount =
-        Number(patientData.emergencyCount || 0) + 1;
+        Number(
+            patientData.emergencyCount || 0
+        ) + 1;
 
 
     patientData.request =
         "EMERGENCY ALERT";
+
 
     patientData.requestTime =
         new Date().toLocaleTimeString();
@@ -1108,7 +1203,7 @@ function triggerEmergency() {
 
 
 /* =========================================================
-   EMERGENCY DISPLAY
+   21. EMERGENCY DISPLAY
    ========================================================= */
 
 function updateEmergencyDisplay() {
@@ -1183,7 +1278,7 @@ function updateEmergencyDisplay() {
 
 
 /* =========================================================
-   RESOLVE EMERGENCY
+   22. RESOLVE EMERGENCY
    ========================================================= */
 
 function resolveEmergency() {
@@ -1210,7 +1305,7 @@ function resolveEmergency() {
 
 
 /* =========================================================
-   15. ALERTS
+   23. ALERTS
    ========================================================= */
 
 function updateAlerts() {
@@ -1274,27 +1369,7 @@ function updateAlerts() {
 
 
 /* =========================================================
-   16. PATIENT REQUEST
-   ========================================================= */
-
-function updatePatientRequest(request) {
-
-    patientData.request =
-        request;
-
-    patientData.requestTime =
-        new Date().toLocaleTimeString();
-
-
-    saveData();
-
-    updateDashboard();
-
-}
-
-
-/* =========================================================
-   17. REPORT
+   24. REPORT
    ========================================================= */
 
 function updateReport() {
@@ -1310,6 +1385,7 @@ function updateReport() {
             "reportPatientName"
         );
 
+
     if (reportPatient) {
 
         reportPatient.textContent =
@@ -1322,6 +1398,7 @@ function updateReport() {
         document.getElementById(
             "reportHeartRate"
         );
+
 
     if (reportHeart) {
 
@@ -1337,6 +1414,7 @@ function updateReport() {
             "reportSpo2"
         );
 
+
     if (reportSpo2) {
 
         reportSpo2.textContent =
@@ -1350,6 +1428,7 @@ function updateReport() {
         document.getElementById(
             "reportTemperature"
         );
+
 
     if (reportTemperature) {
 
@@ -1365,6 +1444,7 @@ function updateReport() {
             "reportBloodPressure"
         );
 
+
     if (reportBP) {
 
         reportBP.textContent =
@@ -1376,13 +1456,14 @@ function updateReport() {
 
 
 /* =========================================================
-   18. POPUP
+   25. POPUPS
    ========================================================= */
 
 function openPopup(id) {
 
     const popup =
         document.getElementById(id);
+
 
     if (popup) {
 
@@ -1399,6 +1480,7 @@ function closePopup(id) {
     const popup =
         document.getElementById(id);
 
+
     if (popup) {
 
         popup.style.display =
@@ -1410,19 +1492,8 @@ function closePopup(id) {
 
 
 /* =========================================================
-   19. DEMO LIVE HEALTH MONITORING
-   =========================================================
-
-   IMPORTANT:
-   This is only simulated data.
-
-   In the real project:
-   ESP32 + sensors
-          ↓
-      Backend/API
-          ↓
-      Dashboard
-*/
+   26. SIMULATED HEALTH MONITORING
+   ========================================================= */
 
 setInterval(function () {
 
@@ -1437,27 +1508,37 @@ setInterval(function () {
 
     patientData.heartRate =
         Math.max(
+
             50,
+
             Math.min(
+
                 110,
+
                 patientData.heartRate +
                 randomChange
+
             )
+
         );
 
 
     saveData();
 
     updateDashboard();
+
     updateHealthMonitor();
+
     updateReport();
+
     updateAIAnalysis();
+
 
 }, 5000);
 
 
 /* =========================================================
-   20. AI CAMERA HAND GESTURE DETECTION
+   27. AI CAMERA VARIABLES
    ========================================================= */
 
 let cameraStream = null;
@@ -1472,7 +1553,7 @@ let emergencyTriggeredByCamera = false;
 
 
 /* =========================================================
-   START CAMERA
+   28. START CAMERA
    ========================================================= */
 
 async function startCamera() {
@@ -1490,6 +1571,21 @@ async function startCamera() {
         );
 
         return;
+
+    }
+
+
+    if (
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+    ) {
+
+        alert(
+            "Your browser does not support camera access."
+        );
+
+        return;
+
     }
 
 
@@ -1499,7 +1595,9 @@ async function startCamera() {
             await navigator.mediaDevices.getUserMedia({
 
                 video: {
+
                     facingMode: "user"
+
                 },
 
                 audio: false
@@ -1517,10 +1615,6 @@ async function startCamera() {
         initializeHandDetection();
 
 
-        alert(
-            "Camera started.\n\nShow your hand clearly in front of the camera."
-        );
-
     }
 
     catch (error) {
@@ -1532,7 +1626,7 @@ async function startCamera() {
 
 
         alert(
-            "Unable to access the camera.\n\nPlease allow camera permission in your browser."
+            "Unable to access camera.\n\nPlease allow camera permission."
         );
 
     }
@@ -1541,7 +1635,7 @@ async function startCamera() {
 
 
 /* =========================================================
-   STOP CAMERA
+   29. STOP CAMERA
    ========================================================= */
 
 function stopCamera() {
@@ -1556,6 +1650,7 @@ function stopCamera() {
 
             });
 
+
         cameraStream =
             null;
 
@@ -1566,7 +1661,7 @@ function stopCamera() {
 
         try {
 
-            handCamera.stop();
+            handCamera.close();
 
         }
 
@@ -1575,6 +1670,7 @@ function stopCamera() {
             console.log(error);
 
         }
+
 
         handCamera =
             null;
@@ -1648,7 +1744,7 @@ function stopCamera() {
 
 
 /* =========================================================
-   INITIALIZE MEDIAPIPE HAND DETECTION
+   30. INITIALIZE MEDIAPIPE
    ========================================================= */
 
 function initializeHandDetection() {
@@ -1659,10 +1755,11 @@ function initializeHandDetection() {
     ) {
 
         alert(
-            "AI hand detection library could not be loaded.\n\nCheck your internet connection."
+            "MediaPipe AI library could not be loaded.\n\nPlease check your internet connection."
         );
 
         return;
+
     }
 
 
@@ -1672,7 +1769,25 @@ function initializeHandDetection() {
         );
 
 
-    if (!video) return;
+    const canvas =
+        document.getElementById(
+            "cameraCanvas"
+        );
+
+
+    if (!video || !canvas) {
+
+        alert(
+            "Camera elements are missing from the page."
+        );
+
+        return;
+
+    }
+
+
+    const ctx =
+        canvas.getContext("2d");
 
 
     handCamera =
@@ -1682,8 +1797,10 @@ function initializeHandDetection() {
                 function (file) {
 
                     return (
+
                         "https://cdn.jsdelivr.net/npm/@mediapipe/hands/" +
                         file
+
                     );
 
                 }
@@ -1705,31 +1822,53 @@ function initializeHandDetection() {
 
 
     handCamera.onResults(
-        processHandResults
+        function (results) {
+
+            drawHandLandmarks(
+                results,
+                canvas,
+                ctx
+            );
+
+
+            processHandResults(
+                results
+            );
+
+        }
     );
 
 
     const camera =
         new Camera(
+
             video,
+
             {
 
                 onFrame:
                     async function () {
 
-                        if (!handCamera) return;
+                        if (!handCamera) {
+                            return;
+                        }
+
 
                         await handCamera.send({
+
                             image: video
+
                         });
 
                     },
+
 
                 width: 640,
 
                 height: 480
 
             }
+
         );
 
 
@@ -1739,7 +1878,124 @@ function initializeHandDetection() {
 
 
 /* =========================================================
-   PROCESS HAND RESULTS
+   31. DRAW AI HAND LANDMARKS
+   ========================================================= */
+
+function drawHandLandmarks(
+    results,
+    canvas,
+    ctx
+) {
+
+    const video =
+        document.getElementById(
+            "cameraVideo"
+        );
+
+
+    if (!video) return;
+
+
+    canvas.width =
+        video.videoWidth || 640;
+
+
+    canvas.height =
+        video.videoHeight || 480;
+
+
+    ctx.clearRect(
+
+        0,
+
+        0,
+
+        canvas.width,
+
+        canvas.height
+
+    );
+
+
+    if (
+        !results.multiHandLandmarks ||
+        results.multiHandLandmarks.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    const landmarks =
+        results.multiHandLandmarks[0];
+
+
+    /*
+       Draw connections
+    */
+
+    if (
+        typeof drawConnectors !== "undefined" &&
+        typeof HAND_CONNECTIONS !== "undefined"
+    ) {
+
+        drawConnectors(
+
+            ctx,
+
+            landmarks,
+
+            HAND_CONNECTIONS,
+
+            {
+
+                color: "#00ff88",
+
+                lineWidth: 4
+
+            }
+
+        );
+
+    }
+
+
+    /*
+       Draw hand points
+    */
+
+    if (
+        typeof drawLandmarks !== "undefined"
+    ) {
+
+        drawLandmarks(
+
+            ctx,
+
+            landmarks,
+
+            {
+
+                color: "#ffffff",
+
+                fillColor: "#00ff88",
+
+                lineWidth: 2,
+
+                radius: 5
+
+            }
+
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   32. PROCESS HAND RESULTS
    ========================================================= */
 
 function processHandResults(results) {
@@ -1751,19 +2007,28 @@ function processHandResults(results) {
     ) {
 
         updateCameraResult(
+
             "No hand detected",
+
             "Show your hand clearly in front of the camera.",
+
             "0%",
+
             "✋"
+
         );
+
 
         lastAIGesture =
             "";
 
+
         emergencyTriggeredByCamera =
             false;
 
+
         return;
+
     }
 
 
@@ -1780,18 +2045,21 @@ function processHandResults(results) {
     if (!gesture) {
 
         updateCameraResult(
+
             "Unknown gesture",
+
             "Try one of the supported hand gestures.",
+
             "0%",
+
             "❓"
+
         );
 
+
         return;
+
     }
-
-
-    let confidence =
-        gesture.confidence;
 
 
     updateCameraResult(
@@ -1800,7 +2068,7 @@ function processHandResults(results) {
 
         gesture.meaning,
 
-        confidence + "%",
+        gesture.confidence + "%",
 
         gesture.icon
 
@@ -1815,7 +2083,7 @@ function processHandResults(results) {
 
 
 /* =========================================================
-   HAND GESTURE RECOGNITION
+   33. RECOGNIZE HAND GESTURE
    ========================================================= */
 
 function recognizeHandGesture(
@@ -1829,12 +2097,14 @@ function recognizeHandGesture(
     const thumbTip =
         landmarks[4];
 
+
     const thumbIP =
         landmarks[3];
 
 
     const indexTip =
         landmarks[8];
+
 
     const indexPIP =
         landmarks[6];
@@ -1843,12 +2113,14 @@ function recognizeHandGesture(
     const middleTip =
         landmarks[12];
 
+
     const middlePIP =
         landmarks[10];
 
 
     const ringTip =
         landmarks[16];
+
 
     const ringPIP =
         landmarks[14];
@@ -1857,85 +2129,106 @@ function recognizeHandGesture(
     const pinkyTip =
         landmarks[20];
 
+
     const pinkyPIP =
         landmarks[18];
 
 
     const indexExtended =
         isFingerExtended(
+
             indexTip,
+
             indexPIP
+
         );
 
 
     const middleExtended =
         isFingerExtended(
+
             middleTip,
+
             middlePIP
+
         );
 
 
     const ringExtended =
         isFingerExtended(
+
             ringTip,
+
             ringPIP
+
         );
 
 
     const pinkyExtended =
         isFingerExtended(
+
             pinkyTip,
+
             pinkyPIP
+
         );
 
 
     const thumbExtended =
         isThumbExtended(
+
             wrist,
+
             thumbTip,
+
             thumbIP
+
         );
 
 
-    const extendedCount =
-        [
-            indexExtended,
-            middleExtended,
-            ringExtended,
-            pinkyExtended
-        ]
-        .filter(Boolean)
-        .length;
+    const extendedCount = [
+
+        indexExtended,
+
+        middleExtended,
+
+        ringExtended,
+
+        pinkyExtended
+
+    ].filter(Boolean).length;
 
 
     /* =====================================================
-       OPEN PALM → WASHROOM
+       OPEN PALM = WASHROOM
        ===================================================== */
 
     if (
+
         thumbExtended &&
+
         indexExtended &&
+
         middleExtended &&
+
         ringExtended &&
+
         pinkyExtended
+
     ) {
 
         return {
 
-            type:
-                "washroom",
+            type: "washroom",
 
-            name:
-                "Washroom",
+            name: "Washroom",
 
             meaning:
                 "Patient needs assistance to use the washroom.",
 
-            icon:
-                "✋",
+            icon: "✋",
 
-            confidence:
-                94
+            confidence: 94
 
         };
 
@@ -1943,32 +2236,33 @@ function recognizeHandGesture(
 
 
     /* =====================================================
-       TWO FINGERS → EMERGENCY
+       TWO FINGERS = EMERGENCY
        ===================================================== */
 
     if (
+
         indexExtended &&
+
         middleExtended &&
+
         !ringExtended &&
+
         !pinkyExtended
+
     ) {
 
         return {
 
-            type:
-                "emergency",
+            type: "emergency",
 
-            name:
-                "Emergency",
+            name: "Emergency",
 
             meaning:
                 "Emergency assistance required.",
 
-            icon:
-                "✌️",
+            icon: "✌️",
 
-            confidence:
-                91
+            confidence: 91
 
         };
 
@@ -1976,33 +2270,35 @@ function recognizeHandGesture(
 
 
     /* =====================================================
-       THUMB ONLY → WATER
+       THUMB = WATER
        ===================================================== */
 
     if (
+
         thumbExtended &&
+
         !indexExtended &&
+
         !middleExtended &&
+
         !ringExtended &&
+
         !pinkyExtended
+
     ) {
 
         return {
 
-            type:
-                "water",
+            type: "water",
 
-            name:
-                "Water",
+            name: "Water",
 
             meaning:
                 "Patient needs water.",
 
-            icon:
-                "👍",
+            icon: "👍",
 
-            confidence:
-                90
+            confidence: 90
 
         };
 
@@ -2010,30 +2306,29 @@ function recognizeHandGesture(
 
 
     /* =====================================================
-       FIST → FOOD
+       FIST = FOOD
        ===================================================== */
 
     if (
+
         !thumbExtended &&
+
         extendedCount === 0
+
     ) {
 
         return {
 
-            type:
-                "food",
+            type: "food",
 
-            name:
-                "Food",
+            name: "Food",
 
             meaning:
                 "Patient needs food.",
 
-            icon:
-                "✊",
+            icon: "✊",
 
-            confidence:
-                88
+            confidence: 88
 
         };
 
@@ -2046,7 +2341,7 @@ function recognizeHandGesture(
 
 
 /* =========================================================
-   FINGER EXTENSION
+   34. FINGER DETECTION
    ========================================================= */
 
 function isFingerExtended(
@@ -2055,73 +2350,94 @@ function isFingerExtended(
 ) {
 
     return (
-        tip.y <
-        pip.y
+
+        tip.y < pip.y
+
     );
 
 }
 
 
 /* =========================================================
-   THUMB EXTENSION
+   35. THUMB DETECTION
    ========================================================= */
 
 function isThumbExtended(
+
     wrist,
+
     thumbTip,
+
     thumbIP
+
 ) {
 
     const distanceTip =
+
         Math.sqrt(
 
             Math.pow(
+
                 thumbTip.x -
                 wrist.x,
+
                 2
+
             )
 
             +
 
             Math.pow(
+
                 thumbTip.y -
                 wrist.y,
+
                 2
+
             )
 
         );
 
 
     const distanceIP =
+
         Math.sqrt(
 
             Math.pow(
+
                 thumbIP.x -
                 wrist.x,
+
                 2
+
             )
 
             +
 
             Math.pow(
+
                 thumbIP.y -
                 wrist.y,
+
                 2
+
             )
 
         );
 
 
     return (
+
         distanceTip >
         distanceIP * 1.15
+
     );
 
 }
 
 
 /* =========================================================
-   HANDLE AI GESTURE
+   36. HANDLE AI GESTURE
    ========================================================= */
 
 function handleAIGesture(
@@ -2133,13 +2449,19 @@ function handleAIGesture(
 
 
     /*
-       Prevent the same gesture from
-       triggering continuously.
+       Prevent repeated detection
+       every video frame.
     */
 
     if (
-        gestureType === lastAIGesture &&
-        now - lastAIGestureTime < 3000
+
+        gestureType ===
+        lastAIGesture &&
+
+        now -
+        lastAIGestureTime <
+        3000
+
     ) {
 
         return;
@@ -2148,13 +2470,17 @@ function handleAIGesture(
 
 
     /*
-       Emergency should only trigger
-       once until the user changes gesture.
+       Emergency only triggers once
+       until gesture changes.
     */
 
     if (
-        gestureType === "emergency" &&
+
+        gestureType ===
+        "emergency" &&
+
         emergencyTriggeredByCamera
+
     ) {
 
         return;
@@ -2171,7 +2497,10 @@ function handleAIGesture(
 
 
     if (
-        gestureType === "emergency"
+
+        gestureType ===
+        "emergency"
+
     ) {
 
         emergencyTriggeredByCamera =
@@ -2195,14 +2524,19 @@ function handleAIGesture(
 
 
 /* =========================================================
-   UPDATE CAMERA RESULT
+   37. CAMERA RESULT
    ========================================================= */
 
 function updateCameraResult(
+
     name,
+
     meaning,
+
     confidence,
+
     icon
+
 ) {
 
     const iconElement =
@@ -2264,12 +2598,13 @@ function updateCameraResult(
 
 
 /* =========================================================
-   21. WINDOW CLICK
-   Close popups when clicking outside
+   38. CLOSE POPUPS
    ========================================================= */
 
 window.addEventListener(
+
     "click",
+
     function (event) {
 
         const popups =
@@ -2294,9 +2629,10 @@ window.addEventListener(
         );
 
     }
+
 );
 
 
 /* =========================================================
-   END OF SCRIPT
+   END
    ========================================================= */
