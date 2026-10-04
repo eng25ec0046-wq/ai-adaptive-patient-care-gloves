@@ -1872,6 +1872,451 @@ setInterval(function () {
     saveData();
 
     updateDashboard();
+   /* =========================================================
+   AI CAMERA HAND GESTURE DETECTION
+   ========================================================= */
+
+let cameraStream = null;
+let handCamera = null;
+let lastAIGesture = "";
+let lastAIGestureTime = 0;
+
+
+/* ================= START CAMERA ================= */
+
+async function startCamera() {
+
+    const video = document.getElementById("cameraVideo");
+
+    if (!video) {
+        console.error("Camera video element not found.");
+        return;
+    }
+
+    try {
+
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: "user",
+                width: { ideal: 640 },
+                height: { ideal: 480 }
+            },
+            audio: false
+        });
+
+        video.srcObject = cameraStream;
+
+        await video.play();
+
+        initializeHandAI();
+
+        updateCameraResult(
+            "✋",
+            "Camera Active",
+            "Show your hand in front of the camera.",
+            0
+        );
+
+    } catch (error) {
+
+        console.error("Camera error:", error);
+
+        updateCameraResult(
+            "⚠️",
+            "Camera Error",
+            "Please allow camera permission and try again.",
+            0
+        );
+
+        alert(
+            "Camera access was blocked.\n\n" +
+            "Please allow camera permission in your browser."
+        );
+    }
+}
+
+
+/* ================= STOP CAMERA ================= */
+
+function stopCamera() {
+
+    if (cameraStream) {
+
+        cameraStream.getTracks().forEach(function(track) {
+            track.stop();
+        });
+
+        cameraStream = null;
+    }
+
+    if (handCamera) {
+        handCamera.stop();
+        handCamera = null;
+    }
+
+    const video = document.getElementById("cameraVideo");
+
+    if (video) {
+        video.srcObject = null;
+    }
+
+    updateCameraResult(
+        "✋",
+        "Camera Stopped",
+        "Press Start Camera to begin detection.",
+        0
+    );
+}
+
+
+/* ================= INITIALIZE MEDIAPIPE ================= */
+
+function initializeHandAI() {
+
+    const video = document.getElementById("cameraVideo");
+
+    if (!video) return;
+
+    if (typeof Hands === "undefined") {
+
+        updateCameraResult(
+            "⚠️",
+            "AI Library Error",
+            "Hand detection library could not be loaded.",
+            0
+        );
+
+        return;
+    }
+
+    const hands = new Hands({
+        locateFile: function(file) {
+
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+
+        }
+    });
+
+    hands.setOptions({
+
+        maxNumHands: 1,
+
+        modelComplexity: 1,
+
+        minDetectionConfidence: 0.6,
+
+        minTrackingConfidence: 0.6
+
+    });
+
+
+    hands.onResults(processHandResults);
+
+
+    handCamera = new Camera(video, {
+
+        onFrame: async function() {
+
+            await hands.send({
+                image: video
+            });
+
+        },
+
+        width: 640,
+        height: 480
+
+    });
+
+    handCamera.start();
+}
+
+
+/* ================= PROCESS HAND RESULTS ================= */
+
+function processHandResults(results) {
+
+    if (!results.multiHandLandmarks ||
+        results.multiHandLandmarks.length === 0) {
+
+        updateCameraResult(
+            "🔍",
+            "No Hand Detected",
+            "Place your hand clearly in front of the camera.",
+            0
+        );
+
+        return;
+    }
+
+
+    const landmarks = results.multiHandLandmarks[0];
+
+    const gesture = recognizeHandGesture(landmarks);
+
+
+    if (!gesture) {
+
+        updateCameraResult(
+            "✋",
+            "Unknown Gesture",
+            "Try one of the supported hand gestures.",
+            50
+        );
+
+        return;
+    }
+
+
+    updateCameraResult(
+        gesture.icon,
+        gesture.name,
+        gesture.meaning,
+        gesture.confidence
+    );
+
+
+    if (gesture.confidence >= 75) {
+
+        handleAIGesture(gesture.type);
+
+    }
+}
+
+
+/* ================= RECOGNIZE GESTURE ================= */
+
+function recognizeHandGesture(landmarks) {
+
+    const index = isFingerExtended(
+        landmarks,
+        8,
+        6
+    );
+
+    const middle = isFingerExtended(
+        landmarks,
+        12,
+        10
+    );
+
+    const ring = isFingerExtended(
+        landmarks,
+        16,
+        14
+    );
+
+    const pinky = isFingerExtended(
+        landmarks,
+        20,
+        18
+    );
+
+    const thumb = isThumbExtended(
+        landmarks
+    );
+
+
+    /* OPEN PALM = WASHROOM */
+
+    if (
+        thumb &&
+        index &&
+        middle &&
+        ring &&
+        pinky
+    ) {
+
+        return {
+            type: "washroom",
+            icon: "🚻",
+            name: "Washroom Request",
+            meaning: "Patient is requesting to go to the washroom.",
+            confidence: 92
+        };
+
+    }
+
+
+    /* TWO FINGERS = EMERGENCY */
+
+    if (
+        index &&
+        middle &&
+        !ring &&
+        !pinky
+    ) {
+
+        return {
+            type: "emergency",
+            icon: "🚨",
+            name: "Emergency",
+            meaning: "Patient has triggered an emergency request.",
+            confidence: 90
+        };
+
+    }
+
+
+    /* THUMB UP = WATER */
+
+    if (
+        thumb &&
+        !index &&
+        !middle &&
+        !ring &&
+        !pinky
+    ) {
+
+        return {
+            type: "water",
+            icon: "💧",
+            name: "Water Request",
+            meaning: "Patient is requesting water.",
+            confidence: 88
+        };
+
+    }
+
+
+    /* CLOSED FIST = FOOD */
+
+    if (
+        !thumb &&
+        !index &&
+        !middle &&
+        !ring &&
+        !pinky
+    ) {
+
+        return {
+            type: "food",
+            icon: "🍎",
+            name: "Food Request",
+            meaning: "Patient is requesting food.",
+            confidence: 86
+        };
+
+    }
+
+
+    return null;
+}
+
+
+/* ================= FINGER DETECTION ================= */
+
+function isFingerExtended(landmarks, tipIndex, pipIndex) {
+
+    const tip = landmarks[tipIndex];
+
+    const pip = landmarks[pipIndex];
+
+    return tip.y < pip.y;
+}
+
+
+/* ================= THUMB DETECTION ================= */
+
+function isThumbExtended(landmarks) {
+
+    const thumbTip = landmarks[4];
+
+    const thumbIP = landmarks[3];
+
+    const wrist = landmarks[0];
+
+    const tipDistance = Math.abs(
+        thumbTip.x - wrist.x
+    );
+
+    const ipDistance = Math.abs(
+        thumbIP.x - wrist.x
+    );
+
+    return tipDistance > ipDistance + 0.04;
+}
+
+
+/* ================= UPDATE CAMERA RESULT ================= */
+
+function updateCameraResult(
+    icon,
+    name,
+    meaning,
+    confidence
+) {
+
+    const iconElement =
+        document.getElementById("cameraGestureIcon");
+
+    const nameElement =
+        document.getElementById("cameraGestureName");
+
+    const meaningElement =
+        document.getElementById("cameraGestureMeaning");
+
+    const confidenceElement =
+        document.getElementById("cameraConfidence");
+
+
+    if (iconElement) {
+        iconElement.textContent = icon;
+    }
+
+    if (nameElement) {
+        nameElement.textContent = name;
+    }
+
+    if (meaningElement) {
+        meaningElement.textContent = meaning;
+    }
+
+    if (confidenceElement) {
+        confidenceElement.textContent =
+            confidence + "%";
+    }
+}
+
+
+/* ================= HANDLE AI GESTURE ================= */
+
+function handleAIGesture(type) {
+
+    const now = Date.now();
+
+
+    /*
+       Prevent the same gesture from triggering
+       continuously every frame.
+    */
+
+    if (
+        type === lastAIGesture &&
+        now - lastAIGestureTime < 3000
+    ) {
+
+        return;
+
+    }
+
+
+    lastAIGesture = type;
+
+    lastAIGestureTime = now;
+
+
+    /*
+       Use your existing dashboard gesture system.
+    */
+
+    if (typeof detectGesture === "function") {
+
+        detectGesture(type);
+
+    }
+
+}
 
     updateReport();
 
